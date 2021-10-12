@@ -23,14 +23,14 @@ def add_labels_jumps(proc):
     body = proc["body"]
     labels = get_labels(body)
     label_counter = len(labels) #Could be 0 but this might save time
-    if body[1]["opcode"] != "label":
+    if body[0]["opcode"] != "label":
         new_lbl, label_counter = new_label(labels, label_counter)
         labels.add(new_lbl)
-        body.insert(1, {"opcode":"label", "args":[new_lbl], "result":None})
+        body.insert(0, {"opcode":"label", "args":[new_lbl], "result":None})
 
     labels_added = 0
-    for i in range(2, len(body)):
-        if body[i]["opcode"][0] == 'z' and body[i+1]["opcode"] != "label":
+    for i in range(1, len(body)):
+        if body[i]["opcode"][0] == 'j' and body[i+1]["opcode"] != "label":
             new_lbl, label_counter = new_label(labels, label_counter)
             labels.add(new_lbl)
             new_instr = {"opcode":"label", "args":[new_lbl], "result":None}
