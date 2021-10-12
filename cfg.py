@@ -5,29 +5,29 @@ class Node:
         self.label=label
         self.instrs= body if body is not None else []
         self.jumps=[]
-        self.jumps=self.get_dest()
+        self.get_dest()
 
     def last_instr(self):
         return self.instrs[-1]
     
     def get_dest(self):
+        self.jumps=[]
         for instr in self.instrs:
             if instr["opcode"][0]=='j' and instr["args"][-1] not in self.jumps:
                 self.jumps.append(instr["args"][-1])
-        return self.jumps
 
 class CFG:
     def __init__(self,proc,nodes):
         self.proc= proc
         self.nodes=nodes
-        self.edges=[]
-        
+        self.edges=dict()
+        self.update_edges()
 
 
-
-
-    def new_node(self):
-        pass
+    def update_edges(self):
+        self.edges=dict()
+        for node in self.nodes:
+            self.edges[node.label]=node.jumps
 
     def next(self, node):
         pass
@@ -35,21 +35,26 @@ class CFG:
     def prev(self, node):   
         pass
 
-    def edges(self):
-        #create a list of tuples?
-        pass
+    def new_node(self, node):
+        if node not in self.nodes:
+            self.nodes.append(node)
+            self.update_edges()
 
-    def new_node(self):
-        pass
 
-    def delete_node(self):
-        pass
+    def delete_node(self, node):
+        if node in self.nodes:
+            for dest in self.edges[node.label]:
+                self.remove_edge(node.label,dest)
+            self.nodes.remove(node)
+        
     
-    def remove_edge(self):
-        pass
+    def remove_edge(self,src,dest):
+        if dest in self.edges[src]:
+            self.edges[src].remove(dest)
 
-    def add_edge(self):
-        pass
+    def add_edge(self,src,dest):
+        if dest not in self.edges[src]:
+            self.edges[src].append(dest)
 
 
 
