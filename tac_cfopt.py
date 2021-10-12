@@ -84,6 +84,7 @@ def main(fname, sname, coal, uce, jp1, jp2):
 
     for proc in js_obj:
         new_proc = add_labels_jumps(proc)
+        proc_name=new_proc["proc"]
         blocks = proc_to_blocks(new_proc)
         blocks=add_jumps(blocks)
         nodes=create_nodes(blocks)

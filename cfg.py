@@ -3,21 +3,27 @@ import sys
 class Node:
     def __init__(self,label,body=None):
         self.label=label
-        self.body= body if body is not None else []
-        self.instrs= [instr for instr in body]
+        self.instrs= body if body is not None else []
+        self.jumps=[]
+        self.jumps=self.get_dest()
 
     def last_instr(self):
         return self.instrs[-1]
     
-
+    def get_dest(self):
+        for instr in self.instrs:
+            if instr["opcode"][0]=='j' and instr["args"][-1] not in self.jumps:
+                self.jumps.append(instr["args"][-1])
+        return self.jumps
 
 class CFG:
-    def __init__(self,proc,label, nodes):
-        self.label=label
-        self.proc= None
-        self.jumps=None
-        self.instrs=[]
-        pass
+    def __init__(self,proc,nodes):
+        self.proc= proc
+        self.nodes=nodes
+        self.edges=[]
+        for node in nodes:
+            self.edges.appen((node))
+
 
 
 
