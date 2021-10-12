@@ -8,7 +8,6 @@ def get_labels(body):
     labels = set()
     for instr in body:
         if instr["opcode"] == "label":
-            assert instr["args"][0][:1] == "%."
             labels.add(instr["args"][0])
 
     return labels
@@ -46,11 +45,11 @@ def add_labels_jumps(proc):
 
 def main(fname, sname, coal, uce, jp1, jp2):
     with open(fname, 'r') as f:
-        js_obj = f.read()
+        js_obj = json.load(f)
 
     for proc in js_obj:
-        new_body = add_labels_jumps(proc)
-        print(new_body)
+        new_proc = add_labels_jumps(proc)
+        print(new_proc["proc"], new_proc["body"])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
