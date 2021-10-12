@@ -1,4 +1,4 @@
-import json
+import json 
 import sys
 import argparse
 from cfg import *
@@ -43,13 +43,34 @@ def add_labels_jumps(proc):
     else:
         return {"proc":proc["proc"], "body":body}
 
+def proc_to_blocks(proc):
+    blocks = []
+    body = proc["body"]
+    current_block = [body[0]]
+    for i in range(1, len(body)):
+        instr = body[i]
+        if instr["opcode"][0] == 'j' or instr["opcode"] == "ret":
+            current_block.append(instr)
+            blocks.append(current_block.copy())
+            current_block = []
+        elif instr["opcode"] == "label":
+            blocks.append(current_block.copy())
+            current_block = [instr]
+        else:
+            current_block.append(instr)
+
+    return blocks
+
+
 def main(fname, sname, coal, uce, jp1, jp2):
     with open(fname, 'r') as f:
         js_obj = json.load(f)
 
     for proc in js_obj:
         new_proc = add_labels_jumps(proc)
-        print(new_proc["proc"], new_proc["body"])
+        blocks = proc_to_blocks(proc)
+        for block in blocks:
+            print(block)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
