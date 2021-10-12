@@ -22,15 +22,16 @@ class CFG:
         self.obj=js_obj
         self.proc= proc
         self.label=label
+        self.jumps=None
         pass
 
     def new_node(self):
         pass
 
-    def successor(self):
+    def next(self, node):
         pass
 
-    def predecessor(self):
+    def prev(self, node):
         pass
 
     def edges(self):
@@ -49,6 +50,6 @@ class CFG:
     def add_edge(self):
         pass
 
-    
+
 
 
