@@ -1,19 +1,15 @@
 import sys
 
 class Node:
-    def __init__(self,body=None, jmps):
-        self.label=None
+    def __init__(self,label,body=None):
+        self.label=label
         self.body= body if body is not None else []
-        self.jmps= jmps if jmps is not None else []
+        self.instrs= [instr for instr in body]
+
+    def last_instr(self):
+        return self.instrs[-1]
     
-    def next(self):
-        return self.succ
 
-    def prev(self):
-        return self.pred
-
-    def instr(self):
-        pass
 
 class CFG:
     def __init__(self,proc,label, nodes):
@@ -25,8 +21,6 @@ class CFG:
         self.instrs=[]
         pass
 
-    def instrs(self):
-        for instr in js_obj['body']:
 
 
     def new_node(self):
