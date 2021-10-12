@@ -88,9 +88,8 @@ def main(fname, sname, coal, uce, jp1, jp2):
         blocks = proc_to_blocks(new_proc)
         blocks=add_jumps(blocks)
         nodes=create_nodes(blocks)
-        for block in blocks:
-            print(block)
-        print(nodes.jumps)
+        cfg=CFG(proc_name, nodes)
+        print(cfg.edges)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

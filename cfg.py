@@ -30,10 +30,14 @@ class CFG:
             self.edges[node.label]=node.jumps
 
     def next(self, node):
-        pass
+        return self.edges[node.label]
 
     def prev(self, node):   
-        pass
+        prevs=[]
+        for lab in self.edges.keys():
+            if node.label in self.edges[lab]:
+                prevs.append(lab)
+        return prevs
 
     def new_node(self, node):
         if node not in self.nodes:
