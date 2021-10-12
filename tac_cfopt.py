@@ -61,6 +61,15 @@ def proc_to_blocks(proc):
 
     return blocks
 
+def add_jumps(blocks):
+    init_len=len(blocks)
+    for i in range(init_len-1):
+        if blocks[i][-1]["opcode"][0]!='j' and blocks[i][-1]["opcode"]!='ret':
+            new_lbl= blocks[i+1][0]["args"][0]
+            blocks[i].appendf({"opcode":"jmp", "args":[new_lbl], "result":None})
+    return blocks
+
+
 
 def main(fname, sname, coal, uce, jp1, jp2):
     with open(fname, 'r') as f:
