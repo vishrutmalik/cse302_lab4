@@ -20,21 +20,33 @@ def new_label(labels, label_counter):
 
 def add_labels_jumps(proc):
     assert proc["proc"][0] == '@'
-    assert proc["body"][0]["args"][0] == '@'
     body = proc["body"]
     labels = get_labels(body)
     label_counter = len(labels) #Could be 0 but this might save time
     if body[1]["opcode"] != "label":
         new_lbl, label_counter = new_label(labels, label_counter)
-        body.insert({"opcode":"label", "args":[new_lbl], "result":None})
+        labels.add(new_lbl)
+        body.insert(1, {"opcode":"label", "args":[new_lbl], "result":None})
 
+    labels_added = 0
+    for i in range(2, len(body)):
+        if body[i]["opcode"][0] == 'z' and body[i+1]["opcode"] != "label":
+            new_lbl, label_counter = new_label(labels, label_counter)
+            labels.add(new_lbl)
+            new_instr = {"opcode":"label", "args":[new_lbl], "result":None}
+            body.insert(i + labels_added + 1, new_instr)
+
+    if "args" in proc.keys():
+        return {"proc":proc["proc"], "args":proc["args"], "body":body}
+    else:
+        return {"proc":proc["proc"], "body":body}
 
 def main(fname, sname, coal, uce, jp1, jp2):
     with open(fname, 'r') as f:
         js_obj = f.read()
 
     for proc in js_obj:
-        add_labels_jumps(proc)
+        new_body = add_labels_jumps(proc)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
