@@ -29,12 +29,15 @@ def add_labels_jumps(proc):
         body.insert(0, {"opcode":"label", "args":[new_lbl], "result":None})
 
     labels_added = 0
-    for i in range(1, len(body)):
-        if body[i]["opcode"][0] == 'j' and body[i+1]["opcode"] != "label":
-            new_lbl, label_counter = new_label(labels, label_counter)
-            labels.add(new_lbl)
-            new_instr = {"opcode":"label", "args":[new_lbl], "result":None}
-            body.insert(i + labels_added + 1, new_instr)
+    init_length = len(body)
+    for i in range(1, init_length):
+        j = i + labels_added
+        if body[j]["opcode"][0] == 'j':
+            if i == init_length - 1 or body[j+1]["opcode"] != "label":
+                new_lbl, label_counter = new_label(labels, label_counter)
+                labels.add(new_lbl)
+                new_instr = {"opcode":"label", "args":[new_lbl], "result":None}
+                body.insert(j + 1, new_instr)
 
     if "args" in proc.keys():
         return {"proc":proc["proc"], "args":proc["args"], "body":body}
@@ -47,6 +50,7 @@ def main(fname, sname, coal, uce, jp1, jp2):
 
     for proc in js_obj:
         new_body = add_labels_jumps(proc)
+        print(new_body)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
