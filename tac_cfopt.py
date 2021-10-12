@@ -70,6 +70,13 @@ def add_jumps(blocks):
     return blocks
 
 
+def create_nodes(blocks):
+    nodes=[]
+    for block in blocks:
+        label=block["args"][0]
+        nodes.append(Node(label,block))
+    return nodes
+
 
 def main(fname, sname, coal, uce, jp1, jp2):
     with open(fname, 'r') as f:
@@ -77,10 +84,9 @@ def main(fname, sname, coal, uce, jp1, jp2):
 
     for proc in js_obj:
         new_proc = add_labels_jumps(proc)
-        blocks = proc_to_blocks(proc)
+        blocks = proc_to_blocks(new_proc)
         blocks=add_jumps(blocks)
-        for block in blocks:
-            print(block)
+        nodes=create_nodes(blocks)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
