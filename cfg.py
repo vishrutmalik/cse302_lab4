@@ -1,11 +1,9 @@
 import sys
 
 class Node:
-    def __init__(self, pred, succ, body):
+    def __init__(self,body):
         self.label=None
         self.body=body
-        self.pred= None; #as of now
-        self.succ= None; #as of now
         pass
     
     def next(self):
@@ -18,12 +16,18 @@ class Node:
         pass
 
 class CFG:
-    def __init__(self, js_obj, proc, label, nodes):
-        self.obj=js_obj
-        self.proc= proc
+    def __init__(self,proc,label, nodes):
         self.label=label
+        self.proc= None
+        self.args=js_obj['args']
         self.jumps=None
+        assert js_obj['proc'][0]=='@'
+        self.instrs=[]
         pass
+
+    def instrs(self):
+        for instr in js_obj['body']:
+
 
     def new_node(self):
         pass
