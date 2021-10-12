@@ -15,9 +15,7 @@ class CFG:
     def __init__(self,proc,label, nodes):
         self.label=label
         self.proc= None
-        self.args=js_obj['args']
         self.jumps=None
-        assert js_obj['proc'][0]=='@'
         self.instrs=[]
         pass
 
@@ -33,7 +31,7 @@ class CFG:
         pass
 
     def edges(self):
-        #create a tuples?
+        #create a list of tuples?
         pass
 
     def new_node(self):
