@@ -1,10 +1,10 @@
 import sys
 
 class Node:
-    def __init__(self,body):
+    def __init__(self,body=None, jmps):
         self.label=None
-        self.body=body
-        pass
+        self.body= body if body is not None else []
+        self.jmps= jmps if jmps is not None else []
     
     def next(self):
         return self.succ
@@ -35,7 +35,7 @@ class CFG:
     def next(self, node):
         pass
 
-    def prev(self, node):
+    def prev(self, node):   
         pass
 
     def edges(self):
