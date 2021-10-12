@@ -21,8 +21,7 @@ class CFG:
         self.proc= proc
         self.nodes=nodes
         self.edges=[]
-        for node in nodes:
-            self.edges.appen((node))
+        
 
 
 

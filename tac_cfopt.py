@@ -90,7 +90,7 @@ def main(fname, sname, coal, uce, jp1, jp2):
         nodes=create_nodes(blocks)
         for block in blocks:
             print(block)
-        print(nodes)
+        print(nodes.jumps)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
