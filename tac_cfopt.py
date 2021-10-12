@@ -46,15 +46,15 @@ def add_labels_jumps(proc):
 def proc_to_blocks(proc):
     blocks = []
     body = proc["body"]
-    current_block = [body[0]]
-    for i in range(1, len(body)):
-        instr = body[i]
+    current_block = []
+    for instr in body:
         if instr["opcode"][0] == 'j' or instr["opcode"] == "ret":
             current_block.append(instr)
             blocks.append(current_block.copy())
             current_block = []
         elif instr["opcode"] == "label":
-            blocks.append(current_block.copy())
+            if current_block != []:
+                blocks.append(current_block.copy())
             current_block = [instr]
         else:
             current_block.append(instr)
