@@ -115,3 +115,4 @@ class CFG:
                     B2.replace_line(i, newline)
                     B2.remove_lines(i+1, -1)
                     B2.update_jumps()
+                    break
