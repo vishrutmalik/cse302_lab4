@@ -82,6 +82,7 @@ def main(fname, sname, coal, uce, jp1, jp2):
     with open(fname, 'r') as f:
         js_obj = json.load(f)
 
+    res = []
     for proc in js_obj:
         new_proc = add_labels_jumps(proc)
         proc_name=new_proc["proc"]
@@ -89,8 +90,17 @@ def main(fname, sname, coal, uce, jp1, jp2):
         blocks=add_jumps(blocks)
         nodes=create_nodes(blocks)
         cfg=CFG(proc_name, nodes)
-        print(cfg.edges)
-    return cfg
+        if not uce:
+            cfg.uce()
+        if not jp2:
+            cfg.jp2()
+
+    if sname is None:
+        print(res)
+    else:
+        with open(sname, 'w') as f:
+            json.dump(res, sname)
+    return cfg # this return is for testing purposes
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
