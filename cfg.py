@@ -21,7 +21,9 @@ class CFG:
     def __init__(self,proc,nodes):
         self.proc= proc
         self.nodes=nodes
-        self.entry = self.nodes[1]
+        self.nodes_to_labels = {node:node.label for node in self.nodes}
+        self.labels_to_nodes = {node.label:node for node in self.nodes}
+        self.entry = self.nodes[0]
         self.edges=dict()
         self.update_edges()
 
@@ -62,9 +64,10 @@ class CFG:
     
     def aux_uce(self, node, visited):
         visited.add(node)
-        for neighbour in self.next(node):
+        for nbr_label in self.next(node):
+            neighbour = self.labels_to_nodes[nbr_label]
             if neighbour not in visited:
-                self.uce_aux(neighbour, visited)
+                self.aux_uce(neighbour, visited)
 
     def uce(self):
         visited = set()

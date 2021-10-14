@@ -90,6 +90,7 @@ def main(fname, sname, coal, uce, jp1, jp2):
         nodes=create_nodes(blocks)
         cfg=CFG(proc_name, nodes)
         print(cfg.edges)
+    return cfg
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -101,5 +102,5 @@ if __name__ == "__main__":
     parser.add_argument("--disable-jp2", action="store_true", required=False)
     args = parser.parse_args()
 
-    main(args.fname, args.o, args.disable_coal, args.disable_uce,
+    cfg = main(args.fname, args.o, args.disable_coal, args.disable_uce,
          args.disable_jp1, args.disable_jp2)
