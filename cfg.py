@@ -4,17 +4,25 @@ class Node:
     def __init__(self,label,body=None):
         self.label=label
         self.instrs= body if body is not None else []
-        self.jumps=[]
-        self.get_dest()
+        self.dests=[]
+        self.cond_jumps=[]
+        self.update_jumps()
 
     def last_instr(self):
         return self.instrs[-1]
     
-    def get_dest(self):
-        self.jumps=[]
+    def update_jumps(self):
+        self.dests = []
+        self.cond_jumps = []
         for instr in self.instrs:
-            if instr["opcode"][0]=='j' and instr["args"][-1] not in self.jumps:
-                self.jumps.append(instr["args"][-1])
+            instruction = instr["opcode"]
+            args = instr["args"]
+            if instruction[0]=='j':
+                if instruction != "jmp": 
+                    self.cond_jumps.append((instruction, args[0], args[1]))
+                if args[-1] not in self.dests:
+                    self.dests.append(args[-1])
+
 
 
 class CFG:
