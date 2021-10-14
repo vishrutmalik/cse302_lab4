@@ -4,6 +4,7 @@ class Node:
     def __init__(self,label,body=None):
         self.label=label
         self.instrs= body if body is not None else []
+        self.size = len(self.instrs)
         self.dests=[]
         self.cond_jumps=[]
         self.update_jumps()
@@ -14,15 +15,33 @@ class Node:
     def update_jumps(self):
         self.dests = []
         self.cond_jumps = []
-        for instr in self.instrs:
+        for i, instr in enumerate(self.instrs):
             instruction = instr["opcode"]
             args = instr["args"]
             if instruction[0]=='j':
                 if instruction != "jmp": 
-                    self.cond_jumps.append((instruction, args[0], args[1]))
+                    self.cond_jumps.append((instruction, args[0], args[1], i))
                 if args[-1] not in self.dests:
                     self.dests.append(args[-1])
-
+        self.remove_modified_jumps()
+    
+    def remove_modified_jumps(self):
+        temp = self.cond_jumps.copy()
+        for jump in temp:
+            for line in range(jump[3]+1, self.size):
+                if self.instrs[line]["result"] == jump[1]:
+                    self.cond_jumps.remove(jump)
+                    break
+    
+    def replace_line(self, lineno, newline):
+        self.instrs[lineno] = newline
+    
+    def remove_lines(self, startline, endline):
+        if endline == -1:
+            self.instrs = self.instrs[:startline]
+        else:
+            assert startline < endline
+            self.instrs = self.instrs[:startline] + self.instrs[endline:]
 
 
 class CFG:
@@ -84,3 +103,15 @@ class CFG:
             if node not in visited:
                 self.delete_node(node)
         self.update_edges()
+    
+    def jp2_node(self, node):
+        for jump, temporary, dest, lineno in node.cond_jumps:
+            B2 = self.labels_to_nodes[dest]
+            for i, instr in enumerate(B2.instrs):
+                if instr["result"] == temporary:
+                    break
+                if instr["opcode"] == jump and instr["args"][0] == temporary:
+                    newline = {"opcode":"jmp", "args":[instr["args"][1]], "result":None}
+                    B2.replace_line(i, newline)
+                    B2.remove_lines(i+1, -1)
+                    B2.update_jumps()
