@@ -9,6 +9,23 @@ class Node:
         self.cond_jumps=[]
         self.update_jumps()
 
+    def __str__(self):
+        res = ""
+        for instr in self.instrs:
+            if len(instr["args"]) == 1:
+                args = instr["args"][0]
+            else:
+                arg1 = instr["args"][0]
+                arg2 = instr["args"][1]
+                args = f"{arg1}, {arg2}"
+            opcode = instr["opcode"]
+            if instr["result"] is None:
+                res += f"{opcode} {args}\n"
+            else:
+                result = instr["result"]
+                res += f"{result} = {opcode} {args}\n"
+        return res
+
     def last_instr(self):
         return self.instrs[-1]
 
