@@ -11,7 +11,7 @@ class Node:
 
     def last_instr(self):
         return self.instrs[-1]
-    
+
     def update_jumps(self):
         self.dests = []
         self.cond_jumps = []
@@ -19,12 +19,12 @@ class Node:
             instruction = instr["opcode"]
             args = instr["args"]
             if instruction[0]=='j':
-                if instruction != "jmp": 
+                if instruction != "jmp":
                     self.cond_jumps.append((instruction, args[0], args[1], i))
                 if args[-1] not in self.dests:
                     self.dests.append(args[-1])
         self.remove_modified_jumps()
-    
+
     def remove_modified_jumps(self):
         temp = self.cond_jumps.copy()
         for jump in temp:
@@ -32,10 +32,10 @@ class Node:
                 if self.instrs[line]["result"] == jump[1]:
                     self.cond_jumps.remove(jump)
                     break
-    
+
     def replace_line(self, lineno, newline):
         self.instrs[lineno] = newline
-    
+
     def remove_lines(self, startline, endline):
         if endline == -1:
             self.instrs = self.instrs[:startline]
@@ -63,7 +63,7 @@ class CFG:
     def next(self, node):
         return self.edges[node.label]
 
-    def prev(self, node):   
+    def prev(self, node):
         prevs=[]
         for lab in self.edges.keys():
             if node.label in self.edges[lab]:
@@ -80,7 +80,7 @@ class CFG:
             for dest in self.edges[node.label]:
                 self.remove_edge(node.label,dest)
             self.nodes.remove(node)
-    
+
     def remove_edge(self,src,dest):
         if dest in self.edges[src]:
             self.edges[src].remove(dest)
@@ -88,7 +88,7 @@ class CFG:
     def add_edge(self,src,dest):
         if dest not in self.edges[src]:
             self.edges[src].append(dest)
-    
+
     def aux_uce(self, node, visited):
         visited.add(node)
         for nbr_label in self.next(node):
@@ -103,16 +103,41 @@ class CFG:
             if node not in visited:
                 self.delete_node(node)
         self.update_edges()
-    
+
     def jp2_node(self, node):
-        for jump, temporary, dest, lineno in node.cond_jumps:
+        implications = {"jz":["jz"], "jl":["jl", "jle", "jnz"], "jle":["jle"],
+                        "jnz":["jnz"], "jnl":["jnl"], "jnle":["jnle", "jnl",
+                                                              "jnz"]}
+        negations = {"jz":["jl", "jnle", "jnz"], "jl":["jnl", "jnle", "jz"],
+                     "jle":["jnle"], "jnz":["jz"], "jnl":["jl"], "jnle":["jz",
+                                                                         "jl",
+                                                                         "jle"]}
+        for jump, temporary, dest, _ in node.cond_jumps:
             B2 = self.labels_to_nodes[dest]
+            implied = implications[jump]
+            negated = negations[jump]
+            if self.prev(B2) != [node.label]:
+                break
+            # we store lines to delete to later remove them in reverse order
+            to_delete = []
             for i, instr in enumerate(B2.instrs):
                 if instr["result"] == temporary:
                     break
-                if instr["opcode"] == jump and instr["args"][0] == temporary:
-                    newline = {"opcode":"jmp", "args":[instr["args"][1]], "result":None}
+                if instr["opcode"] in implications and \
+                   instr["args"][0] == temporary:
+                    newline = {"opcode":"jmp",
+                               "args":[instr["args"][1]],
+                               "result":None}
                     B2.replace_line(i, newline)
                     B2.remove_lines(i+1, -1)
                     B2.update_jumps()
                     break
+                if instr["opcode"] in negations:
+                    to_delete.append(i)
+            for i in to_delete[::-1]:
+                B2.remove_lines(i, i+1)
+
+    def jp2(self):
+        for node in self.nodes:
+            self.jp2_node(node)
+        self.uce()
