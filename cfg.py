@@ -29,6 +29,10 @@ class Node:
     def last_instr(self):
         return self.instrs[-1]
 
+    def append_instrs(self,instrs):
+        for instr in instrs:
+            self.instrs.append(instr)
+
     def update_jumps(self):
         self.dests = []
         self.cond_jumps = []
@@ -96,6 +100,9 @@ class CFG:
         if node in self.nodes:
             for dest in self.edges[node.label]:
                 self.remove_edge(node.label,dest)
+            for nd in self.nodes:
+                if node.label in self.edges[nd]:
+                    self.remove_edge(nd.label, node.label)
             self.nodes.remove(node)
 
     def remove_edge(self,src,dest):
@@ -158,3 +165,17 @@ class CFG:
         for node in self.nodes:
             self.jp2_node(node)
         self.uce()
+
+    def coalesce(self):
+        #we just shift the properties to the parent node after removing jmp instr
+        for label in self.edges.keys():
+            if len(self.edges[label]) ==1 and self.prev(self.labels_to_nodes(self.edges[label][0]))==[label]:
+                linstr=self.labels_to_nodes[label].last_instr()
+                if linstr["opcode"]=='jmp':
+                    self.labels_to_nodes[label].remove_lines(-2,-1)
+                new_body=self.labels_to_nodes[self.edges[label]].instrs
+                self.labels_to_nodes[self.edges[label]].append_instrs(new_body)
+                for edg in self.edges[self.edges[label][0]]:
+                    self.edges[label].append(edg)
+                self.delete_node(self.labels_to_nodes[self.edges[label][0]])
+                self.update_edges()
