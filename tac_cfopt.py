@@ -90,11 +90,12 @@ def main(fname, sname, coal, uce, jp1, jp2):
         blocks=add_jumps(blocks)
         nodes=create_nodes(blocks)
         cfg=CFG(proc_name, nodes)
-        # if not uce:
-        #     cfg.uce()
-        # if not jp2:
-        #     cfg.jp2()
-        cfg.coalesce()
+        if not uce:
+            cfg.uce()
+        if not jp2:
+            cfg.jp2()
+        if not coal:
+            cfg.coalesce()
 
     if sname is None:
         print(res)
