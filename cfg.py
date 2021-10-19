@@ -104,7 +104,7 @@ class CFG:
             for dest in self.edges[node.label]:
                 self.remove_edge(node.label,dest)
             for nd in self.nodes:
-                if node.label in self.edges[nd]:
+                if node.label in self.edges[nd.label]:
                     self.remove_edge(nd.label, node.label)
             self.nodes.remove(node)
 
@@ -170,6 +170,19 @@ class CFG:
         self.uce()
 
     def coalesce(self):
+        # for node in self.nodes:
+        #     if len(node.dests) == 1 and len(self.prev(node.dests[0])) == 1:
+        #         B2 = self.labels_to_nodes[node.dests[0]]
+        #         linstr = node.last_instr()
+        #         if linstr["opcode"] == "jmp":
+        #             node.remove_lines(-2, -1)
+        #         new_body = B2.instrs
+        #         node.append_instrs(new_body)
+        #         for edg in self.edges[B2.label]:
+        #             self.edges[node.label].append(edg)
+        #         self.delete_node(B2)
+        #         self.update_edges()
+
         #we just shift the properties to the parent node after removing jmp instr
         print(self.edges)
         i=1
@@ -181,7 +194,7 @@ class CFG:
                 linstr=self.labels_to_nodes[label].last_instr()
                 print(linstr)
                 if linstr["opcode"]=='jmp':
-                    self.labels_to_nodes[label].remove_lines(-2,-1)  
+                    self.labels_to_nodes[label].remove_lines(-2,-1)
                 new_body=self.labels_to_nodes[self.edges[label][0]].instrs
                 self.labels_to_nodes[label].append_instrs(new_body)
                 for edg in self.edges[self.edges[label][0]]:
