@@ -104,7 +104,7 @@ class CFG:
             for dest in self.edges[node.label]:
                 self.remove_edge(node.label,dest)
             for nd in self.nodes:
-                if node.label in self.edges[nd]:
+                if node.label in self.edges[nd.label]:
                     self.remove_edge(nd.label, node.label)
             self.nodes.remove(node)
 
