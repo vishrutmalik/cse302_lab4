@@ -27,6 +27,9 @@ class Node:
         return res
 
     def last_instr(self):
+        if len(self.instrs)==0:
+            print("Error the instruction list is empty")
+            return
         return self.instrs[-1]
 
     def append_instrs(self,instrs):
@@ -79,7 +82,7 @@ class CFG:
     def update_edges(self):
         self.edges=dict()
         for node in self.nodes:
-            self.edges[node.label]=node.jumps
+            self.edges[node.label]=node.dests
 
     def next(self, node):
         return self.edges[node.label]
@@ -168,13 +171,19 @@ class CFG:
 
     def coalesce(self):
         #we just shift the properties to the parent node after removing jmp instr
+        print(self.edges)
+        i=1
         for label in self.edges.keys():
-            if len(self.edges[label]) ==1 and self.prev(self.labels_to_nodes(self.edges[label][0]))==[label]:
+            print(i,label)
+            i+=1
+            if len(self.edges[label]) ==1 and self.prev(self.labels_to_nodes[self.edges[label][0]])==[label]:
+                print("ok")
                 linstr=self.labels_to_nodes[label].last_instr()
+                print(linstr)
                 if linstr["opcode"]=='jmp':
-                    self.labels_to_nodes[label].remove_lines(-2,-1)
-                new_body=self.labels_to_nodes[self.edges[label]].instrs
-                self.labels_to_nodes[self.edges[label]].append_instrs(new_body)
+                    self.labels_to_nodes[label].remove_lines(-2,-1)  
+                new_body=self.labels_to_nodes[self.edges[label][0]].instrs
+                self.labels_to_nodes[label].append_instrs(new_body)
                 for edg in self.edges[self.edges[label][0]]:
                     self.edges[label].append(edg)
                 self.delete_node(self.labels_to_nodes[self.edges[label][0]])
