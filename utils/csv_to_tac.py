@@ -14,17 +14,17 @@ def parse_body(line):
         elif c == ']':
             nb_brackets -= 1
             if current_string != "":
-                current_list.append(current_string)
+                current_list.append(current_string.strip())
                 current_string = ""
             res.append(current_list.copy())
             current_list = []
         elif c == ' ' and nb_brackets == 0:
             if current_string != "":
-                res.append(current_string)
+                res.append(current_string.strip())
                 current_string = ""
-        elif c == ' ' and nb_brackets > 0:
+        elif c == ',' and nb_brackets > 0:
             if current_string != "":
-                current_list.append(current_string)
+                current_list.append(current_string.strip())
                 current_string = ""
         else:
             current_string += c
@@ -58,7 +58,7 @@ def main(fname):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("fname")
-    parser.add_argument("--create-json", action="store_true", required=False)
+    parser.add_argument("--create-json", action="store_false", required=False)
     parser.add_argument("--print", action="store_true", required=False)
 
     args = parser.parse_args()
@@ -70,9 +70,6 @@ if __name__ == "__main__":
     if args.create_json:
         if args.fname[-4:] == ".ssv":
             jname = args.fname[:-4] + ".tac.json"
-        elif '.' in args.fname:
-            i = args.fname.find(".")
-            jname = args.fname[:i] + ".tac.json"
         else:
             jname = args.fname + ".tac.json"
 
