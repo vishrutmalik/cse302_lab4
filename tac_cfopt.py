@@ -101,7 +101,7 @@ def main(fname, sname, coal, uce, jp1, jp2):
         print(res)
     else:
         with open(sname, 'w') as f:
-            json.dump(res, sname)
+            json.dump(res, f)
     return cfg # this return is for testing purposes
 
 if __name__ == "__main__":
