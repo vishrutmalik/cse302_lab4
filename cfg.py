@@ -80,55 +80,88 @@ class CFG:
 
 
     def update_edges(self):
+        """
+        Update the edges dictionnary using the information stored in the node
+        objects
+        """
         self.edges=dict()
         for node in self.nodes:
             self.edges[node.label]=node.dests
 
     def next(self, node):
+        """
+        Polymorphic function that return the list of successors to a node
+        """
+        if isinstance(node, str):
+            return self.edges[node]
         return self.edges[node.label]
 
     def prev(self, node):
+        """
+        Polymorphic function that returns the list of predecessors to a node
+        """
+        if isinstance(node, str):
+            label = node
+        else:
+            label = node.label
+
         prevs=[]
-        for lab in self.edges.keys():
-            if node.label in self.edges[lab]:
+        for lab, dests in self.edges.items():
+            if label in dests:
                 prevs.append(lab)
         return prevs
 
     def new_node(self, node):
+        """
+        Given a node object, add it to self.nodes and update the edges
+        """
         if node not in self.nodes:
             self.nodes.append(node)
             self.update_edges()
 
     def delete_node(self, node):
-        if node in self.nodes:
-            for dest in self.edges[node.label]:
-                self.remove_edge(node.label,dest)
-            for nd in self.nodes:
-                if node.label in self.edges[nd.label]:
-                    self.remove_edge(nd.label, node.label)
-            self.nodes.remove(node)
+        """
+        Takes a block or a label and removes it from the cfg
+        We assume that the node is disjoint from the rest of the graph
+        """
+        if isinstance(node, str):
+            node = self.labels_to_nodes[node]
+        self.nodes.remove(node)
 
     def remove_edge(self,src,dest):
+        """
+        Given source and destination labels, remove the corresponding edge to
+        self.edges
+        """
         if dest in self.edges[src]:
             self.edges[src].remove(dest)
 
     def add_edge(self,src,dest):
+        """
+        Given source and destination labels, add the corresponding edge to
+        self.edges
+        """
         if dest not in self.edges[src]:
             self.edges[src].append(dest)
 
-    def aux_uce(self, node, visited):
-        visited.add(node)
-        for nbr_label in self.next(node):
-            neighbour = self.labels_to_nodes[nbr_label]
-            if neighbour not in visited:
-                self.aux_uce(neighbour, visited)
+    def aux_uce(self, node_label, visited):
+        visited.add(node_label)
+        for nbr_label in self.next(node_label):
+            if nbr_label not in visited:
+                self.aux_uce(nbr_label, visited)
 
     def uce(self):
         visited = set()
-        self.aux_uce(self.entry, visited)
+        self.aux_uce(self.entry.label, visited)
+
+        to_delete = []
         for node in self.nodes:
-            if node not in visited:
-                self.delete_node(node)
+            if node.label not in visited:
+                to_delete.append(node)
+
+        for node in to_delete:
+            self.delete_node(node)
+
         self.update_edges()
 
     def jp2_node(self, node):
@@ -150,7 +183,7 @@ class CFG:
             for i, instr in enumerate(B2.instrs):
                 if instr["result"] == temporary:
                     break
-                if instr["opcode"] in implications and \
+                if instr["opcode"] in implied and \
                    instr["args"][0] == temporary:
                     newline = {"opcode":"jmp",
                                "args":[instr["args"][1]],
@@ -159,14 +192,19 @@ class CFG:
                     B2.remove_lines(i+1, -1)
                     B2.update_jumps()
                     break
-                if instr["opcode"] in negations:
+                if instr["opcode"] in negated:
                     to_delete.append(i)
+
             for i in to_delete[::-1]:
                 B2.remove_lines(i, i+1)
+
+        node.update_jumps()
 
     def jp2(self):
         for node in self.nodes:
             self.jp2_node(node)
+
+        self.update_edges()
         self.uce()
 
     def coalesce(self):
