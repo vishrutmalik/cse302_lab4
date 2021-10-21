@@ -1,0 +1,76 @@
+{
+    "proc": "@main",
+    "args": [],
+    "body": [
+        {
+            "opcode": "test",
+            "args": [
+                "arg1,",
+                "arg2"
+            ],
+            "result": "result"
+        },
+        {
+            "opcode": "test",
+            "args": [
+                "arg1,",
+                "arg2"
+            ],
+            "result": "result"
+        },
+        {
+            "opcode": "test",
+            "args": [
+                "arg1,",
+                "arg2"
+            ],
+            "result": "result"
+        },
+        {
+            "opcode": "test",
+            "args": [
+                "arg1,",
+                "arg2"
+            ],
+            "result": "result"
+        },
+        {
+            "opcode": "test",
+            "args": [
+                "arg1,",
+                "arg2"
+            ],
+            "result": "result"
+        },
+        {
+            "opcode": "test",
+            "args": [
+                "arg1,",
+                "arg2"
+            ],
+            "result": "result"
+        },
+        {
+            "opcode": "test",
+            "args": [
+                "arg1,",
+                "arg2"
+            ],
+            "result": "result"
+        },
+        {
+            "opcode": "test",
+            "args": [
+                "arg1,",
+                "arg2,",
+                "arg3"
+            ],
+            "result": "result"
+        },
+        {
+            "opcode": "test",
+            "args": [],
+            "result": "result2"
+        }
+    ]
+}
