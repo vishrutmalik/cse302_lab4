@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    res = main(args.fname)
+    res = [main(args.fname)]
     if args.print:
         print(res)
 
