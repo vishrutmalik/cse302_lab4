@@ -5,7 +5,7 @@ from tac_cfopt import *
 
 dirname, filename = os.path.split(os.path.abspath(__file__))
 
-class testCfgUce(unittest.TestCase):
+class testUce(unittest.TestCase):
     def setUp(self):
         fname = "./examples/dead_code.tac.json"
 
@@ -13,7 +13,7 @@ class testCfgUce(unittest.TestCase):
             js_obj = json.load(f)
 
         proc = js_obj[0]
-        new_proc = add_labels_jumps(proc)
+        new_proc = add_labels(proc)
         proc_name = new_proc["proc"]
         blocks = proc_to_blocks(new_proc)
         blocks = add_jumps(blocks)
@@ -44,6 +44,50 @@ class testCfgUce(unittest.TestCase):
     def tearDown(self):
         del self.cfg
 
+class testJP2(unittest.TestCase):
+
+    def prepfile(self, fname):
+        with open(fname, 'r') as f:
+            js_obj = json.load(f)
+
+        proc = js_obj[0]
+        new_proc = add_labels(proc)
+        proc_name = new_proc["proc"]
+        blocks = proc_to_blocks(new_proc)
+        blocks = add_jumps(blocks)
+        nodes = create_nodes(blocks)
+        return CFG(proc_name, nodes)
+
+    def setUp(self):
+        fname1 = "./examples/cond_jmps.tac.json"
+        self.cfg1 = self.prepfile(fname1)
+
+        fname2 = "./examples/cond_jmps2.tac.json"
+        self.cfg2 = self.prepfile(fname2)
+
+    def test_jp2_implied(self):
+        self.cfg1.jp2()
+        self.assertEqual(len(self.cfg1.nodes), 5)
+
+        node2 = self.cfg1.labels_to_nodes["%.L2"]
+        expected_jmp = {"opcode":"jmp", "args":["%.L3"], "result":None}
+
+        self.assertEqual(node2.instrs[1], expected_jmp)
+        self.assertEqual(len(node2.instrs), 2)
+
+    def test_jp2_negated(self):
+        self.cfg2.jp2()
+        self.assertEqual(len(self.cfg2.nodes), 4)
+
+        node2 = self.cfg2.labels_to_nodes["%.L2"]
+        expected_jmp = {"opcode":"jmp", "args":["%.L30"], "result":None}
+
+        self.assertEqual(node2.instrs[1], expected_jmp)
+        self.assertEqual(len(node2.instrs), 2)
+
+    def tearDown(self):
+        del self.cfg1
+        del self.cfg2
 
 if __name__ == "__main__":
     unittest.main()

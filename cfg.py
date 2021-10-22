@@ -14,6 +14,8 @@ class Node:
         for instr in self.instrs:
             if len(instr["args"]) == 1:
                 args = instr["args"][0]
+            elif len(instr["args"]) == 0:
+                args = ""
             else:
                 arg1 = instr["args"][0]
                 arg2 = instr["args"][1]
@@ -78,6 +80,11 @@ class CFG:
         self.edges=dict()
         self.update_edges()
 
+    def __str__(self):
+        res = ""
+        for node in self.nodes:
+            res += str(node) + "\n"
+        return res
 
     def update_edges(self):
         """
@@ -93,8 +100,11 @@ class CFG:
         Polymorphic function that return the list of successors to a node
         """
         if isinstance(node, str):
-            return self.edges[node]
-        return self.edges[node.label]
+            if node in self.labels_to_nodes.keys():
+                node = self.labels_to_nodes[node]
+            else:
+                return []
+        return node.dests
 
     def prev(self, node):
         """
@@ -190,19 +200,21 @@ class CFG:
                                "result":None}
                     B2.replace_line(i, newline)
                     B2.remove_lines(i+1, -1)
-                    B2.update_jumps()
                     break
-                if instr["opcode"] in negated:
+                if instr["opcode"] in negated and \
+                   instr["args"][0] == temporary:
                     to_delete.append(i)
 
             for i in to_delete[::-1]:
                 B2.remove_lines(i, i+1)
 
-        node.update_jumps()
 
     def jp2(self):
         for node in self.nodes:
             self.jp2_node(node)
+
+        for node in self.nodes:
+            node.update_jumps()
 
         self.update_edges()
         self.uce()
