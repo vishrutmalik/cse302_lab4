@@ -17,7 +17,7 @@ def new_label(labels, label_counter):
         label_counter += 1
     return (f"%.L{label_counter}", label_counter)
 
-def add_labels_jumps(proc):
+def add_labels(proc):
     assert proc["proc"][0] == '@'
     body = proc["body"]
     labels = get_labels(body)
@@ -32,7 +32,8 @@ def add_labels_jumps(proc):
     for i in range(1, init_length):
         j = i + labels_added
         if body[j]["opcode"][0] == 'j':
-            if i == init_length - 1 or body[j+1]["opcode"] != "label":
+            if i == init_length - 1 or (body[j+1]["opcode"] != "label" and
+                                        body[j+1]["opcode"][0] != 'j'):
                 new_lbl, label_counter = new_label(labels, label_counter)
                 labels.add(new_lbl)
                 new_instr = {"opcode":"label", "args":[new_lbl], "result":None}
@@ -47,15 +48,20 @@ def proc_to_blocks(proc):
     blocks = []
     body = proc["body"]
     current_block = []
-    for instr in body:
-        if instr["opcode"][0] == 'j' or instr["opcode"] == "ret":
+    for i, instr in enumerate(body):
+        if i == len(body)-1 or \
+        (instr["opcode"][0] == 'j' and
+        body[i+1]["opcode"][0] != 'j') or \
+        instr["opcode"] == "ret":
             current_block.append(instr)
             blocks.append(current_block.copy())
             current_block = []
+
         elif instr["opcode"] == "label":
             if current_block != []:
                 blocks.append(current_block.copy())
             current_block = [instr]
+
         else:
             current_block.append(instr)
 
@@ -84,12 +90,12 @@ def main(fname, sname, coal, uce, jp1, jp2):
 
     res = []
     for proc in js_obj:
-        new_proc = add_labels_jumps(proc)
-        proc_name=new_proc["proc"]
+        new_proc = add_labels(proc)
+        proc_name = new_proc["proc"]
         blocks = proc_to_blocks(new_proc)
-        blocks=add_jumps(blocks)
-        nodes=create_nodes(blocks)
-        cfg=CFG(proc_name, nodes)
+        blocks = add_jumps(blocks)
+        nodes = create_nodes(blocks)
+        cfg = CFG(proc_name, nodes)
         if not uce:
             cfg.uce()
         if not jp2:
