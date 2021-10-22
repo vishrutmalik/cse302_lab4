@@ -30,6 +30,15 @@ def parse_body(line):
             current_string += c
 
     res.append(current_string)
+
+    for i, elem in enumerate(res):
+        if isinstance(elem, str):
+            if elem == "None":
+                res[i] = None
+        if isinstance(elem, list):
+            for i, arg in enumerate(elem):
+                if arg == "None":
+                    elem[i] = None
     return res
 
 def main(fname):

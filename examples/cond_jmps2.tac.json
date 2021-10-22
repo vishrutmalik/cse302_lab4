@@ -33,7 +33,7 @@
                 "result": null
             },
             {
-                "opcode": "jz",
+                "opcode": "jnz",
                 "args": [
                     "%1",
                     "%.L3"

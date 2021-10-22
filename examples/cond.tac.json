@@ -8,7 +8,7 @@
                 "args": [
                     "%.L1"
                 ],
-                "result": null
+                "result": "None"
             },
             {
                 "opcode": "jz",
@@ -16,21 +16,21 @@
                     "%1",
                     "%.L2"
                 ],
-                "result": null
+                "result": "None"
             },
             {
                 "opcode": "jmp",
                 "args": [
                     "%.L20"
                 ],
-                "result": null
+                "result": "None"
             },
             {
                 "opcode": "label",
                 "args": [
                     "%.L2"
                 ],
-                "result": null
+                "result": "None"
             },
             {
                 "opcode": "jz",
@@ -38,54 +38,40 @@
                     "%1",
                     "%.L3"
                 ],
-                "result": null
+                "result": "None"
             },
             {
                 "opcode": "jmp",
                 "args": [
-                    "%.L30"
+                    "%.l30"
                 ],
-                "result": null
+                "result": "None"
             },
             {
                 "opcode": "label",
                 "args": [
                     "%.L3"
                 ],
-                "result": null
-            },
-            {
-                "opcode": "jmp",
-                "args": [
-                    "%.L20"
-                ],
-                "result": null
+                "result": "None"
             },
             {
                 "opcode": "label",
                 "args": [
                     "%.L20"
                 ],
-                "result": null
-            },
-            {
-                "opcode": "jmp",
-                "args": [
-                    "%.L30"
-                ],
-                "result": null
+                "result": "None"
             },
             {
                 "opcode": "label",
                 "args": [
                     "%.L30"
                 ],
-                "result": null
+                "result": "None"
             },
             {
                 "opcode": "ret",
                 "args": [],
-                "result": null
+                "result": "None"
             }
         ]
     }
