@@ -65,6 +65,9 @@ class testJP2(unittest.TestCase):
         fname2 = "./examples/cond_jmps2.tac.json"
         self.cfg2 = self.prepfile(fname2)
 
+        fname3 = "./examples/cond_update_temp.tac.json"
+        self.cfg3 = self.prepfile(fname3)
+
     def test_jp2_implied(self):
         self.cfg1.jp2()
         self.assertEqual(len(self.cfg1.nodes), 5)
@@ -85,9 +88,20 @@ class testJP2(unittest.TestCase):
         self.assertEqual(node2.instrs[1], expected_jmp)
         self.assertEqual(len(node2.instrs), 2)
 
+    def test_updating_temporary(self):
+        self.cfg3.jp2()
+        self.assertEqual(len(self.cfg2.nodes), 5)
+
+        node2 = self.cfg3.labels_to_nodes["%.L2"]
+        expected_jmp = {"opcode":"jz", "args":["%1", "%.L3"], "result":None}
+        self.assertEqual(node2.instrs[2], expected_jmp)
+        self.assertEqual(len(node2.instrs), 4)
+
+
     def tearDown(self):
         del self.cfg1
         del self.cfg2
+        del self.cfg3
 
 if __name__ == "__main__":
     unittest.main()
