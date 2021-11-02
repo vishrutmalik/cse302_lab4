@@ -97,6 +97,28 @@ class Variable(Expr):
         self.type_ = var_type
 
 
+class Param():
+    def __init__(self, name: str, type_, location=None):
+        self.name = name
+        self.location = location 
+        self.type_ = type_
+    
+    def __str__(self):
+        return f"{self.name}: {self.type_}"
+    
+    def get_type(self):
+        return self.type_
+
+    def check_syntax(self, current_state):
+        # declaration twice in the same scope
+        if self.name in current_state.declared_vars[-1].keys():
+            if current_state.declared_vars[self.name].location is not None:
+                print(f"Info: initial declaration on line {current_state.declared_vars[self.name].location[0]}")
+            error_message(f"variable already declared: {self.name}", self.location)
+
+        current_state.declared_vars[-1][self.name] = self
+
+
 class Number(Expr):
     def __init__(self, value, location=None):
         self.value = value
@@ -344,11 +366,13 @@ class Return(Statement):
                 
 
 class Procdecl(Statement):
-    def __init__(self, statements, name: str, argtype, rtt):
+    def __init__(self, name: str, params: list[Param], statements, rtt, location=None):
         self.name = name
-        self.argtype = argtype
+        self.params = params
+        self.argtype = [param.type_ for param in params] 
         self.return_type = rtt
         self.statements = statements
+        self.location = location
 
     def __str__(self):
         res = "\n".join(str(statement)
@@ -364,8 +388,14 @@ class Procdecl(Statement):
         proc_decls[self.name] = (self.argtype, self.return_type)
 
     def check_syntax(self, current_state: CheckState):
+        if not isinstance(self.statements[-1], Return):
+            error_message(f"no return found at end of procedure {self.name}", self.location)
+
         current_state.declared_vars.append(dict())
         current_state.rtt = self.return_type
+        for param in self.params:
+            param.check_syntax(current_state)
+
         for statement in self.statements:
             statement.check_syntax(current_state)
         current_state.declared_vars.pop()
