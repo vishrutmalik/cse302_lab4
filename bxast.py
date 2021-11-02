@@ -94,6 +94,8 @@ class Variable(Expr):
             error_message(f"undeclared variable {self.name}", self.location)
         if var_type not in valid_types:
             error_message(f"invalid variable type: {var_type}", self.location)
+        if var_type == "void":
+            error_message(f"variable {self.name} cannot be of type void", self.location)
         self.type_ = var_type
 
 
@@ -209,6 +211,9 @@ class ProcCall(Expr):
         for arg in self.args:
             arg.check_syntax(current_state)
         typelist = [arg.type_ for arg in self.args]
+
+        if self.proc_name not in current_state.declared_procs.keys():
+            error_message(f"undeclared procedure {self.proc_name} called", self.location)
 
         proc_type, arg_types = current_state.declared_procs[self.proc_name]
         if typelist != arg_types:
