@@ -232,6 +232,7 @@ class Vardecl(Statement):
         self.expression = expression # expr
         self.location = location
         self.type_ = type_
+        self.return_ = False
 
     def __str__(self):
         return f"{str(self.type_)} {str(self.variable)} = {str(self.expression)}"
@@ -256,6 +257,7 @@ class Assign(Statement):
         self.variable = variable
         self.expression = expr # expr
         self.location = location
+        self.return_ = False
 
     def __str__(self):
         return f"{str(self.variable)} = {str(self.expression)}"
@@ -273,6 +275,7 @@ class Ifelse(Statement):
     def __init__(self, condition, block, optelse, location=None):
         self.condition = condition # bool expr
         self.block = block 
+        self.return_ = False
         if optelse is not None:
             self.optelse = optelse
         else:
@@ -291,6 +294,10 @@ class Ifelse(Statement):
         self.optelse.check_syntax(current_state)
         if (self.condition.type_ != "bool"):
             error_message("condition of a if statement must be a boolean", self.location)
+        
+        # if there is a return on all paths then set return_ to true
+        if self.block.return_ and self.optelse.return_:
+            self.return_ = True
 
 
 class While(Statement):
@@ -298,6 +305,7 @@ class While(Statement):
         self.condition = condition
         self.block = block
         self.location = location
+        self.return_ = False
 
     def __str__(self):
         return f"while ({self.condition})" + "{\n" + str(self.block) + "}"
@@ -315,6 +323,7 @@ class Jump(Statement):
     def __init__(self, type_, location=None):
         self.type_ = type_
         self.location = location
+        self.return_ = False
 
     def __str__(self):
         return str(self.type_)
@@ -327,6 +336,7 @@ class Jump(Statement):
 
 class Block(Statement):
     def __init__(self, stmts):
+        self.return_ = False
         if stmts is not None:
             self.statements = stmts
         else:
@@ -339,6 +349,10 @@ class Block(Statement):
         current_state.declared_vars.append(dict())
         for s in self.statements:
             s.check_syntax(current_state)
+
+            # flag to indicate if block contains a return
+            if isinstance(s, Return):
+                self.return_ = True
         current_state.declared_vars.pop()
 
 
@@ -346,6 +360,7 @@ class Return(Statement):
     def __init__(self, expression, location=None):
         self.expression = expression 
         self.location = location
+        self.return_ = True
     
     def __str__(self):
         res = "return"
@@ -393,9 +408,8 @@ class Procdecl(Statement):
         proc_decls[self.name] = (self.argtype, self.return_type)
 
     def check_syntax(self, current_state: CheckState):
-        if not isinstance(self.statements[-1], Return):
-            error_message(f"no return found at end of procedure {self.name}", self.location)
-
+        saw_return = False
+        ifs = []
         current_state.declared_vars.append(dict())
         current_state.rtt = self.return_type
         for param in self.params:
@@ -403,6 +417,11 @@ class Procdecl(Statement):
 
         for statement in self.statements:
             statement.check_syntax(current_state)
+            if statement.return_:
+                saw_return = True
+        
+        if not saw_return:
+            error_message(f"{self.name}: return not found on all code paths", self.location)
         current_state.declared_vars.pop()
 
 
