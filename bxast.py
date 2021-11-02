@@ -403,9 +403,15 @@ class GlobalVardecl(Statement):
 
 
 class GlobalScope():
-    def __init__(self, procedures, global_vars):
-        self.procedures = procedures
-        self.global_vars = global_vars
+    def __init__(self, declarations):
+        self.procedures = []
+        self.global_vars = []
+
+        for declaration in declarations:
+            if isinstance(declaration, Procdecl):
+                self.procedures.append(declaration)
+            elif isinstance(declaration, GlobalVardecl):
+                self.global_vars.append(declaration)
     
     def __str__(self):
         res = "\n".join(str(global_var)
