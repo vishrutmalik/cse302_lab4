@@ -48,7 +48,7 @@ class CheckState():
 
 
 class BinOp():
-    def __init__(self, op, location=None):
+    def __init__(self, op: str, location=None):
         self.name = op
         self.argtype_ = binop_dict[op][1]
         self.rettype_ = binop_dict[op][2]
@@ -59,7 +59,7 @@ class BinOp():
 
 
 class UnOp():
-    def __init__(self, op, location=None):
+    def __init__(self, op: str, location=None):
         self.name = op
         self.argtype_ = unop_dict[self.name][1]
         self.rettype_ = unop_dict[self.name][2]
@@ -74,7 +74,7 @@ class Expr:
 
 
 class Variable(Expr):
-    def __init__(self, name, location=None):
+    def __init__(self, name: str, location=None):
         self.name = name
         self.location = location
         self.type_ = None
@@ -173,7 +173,7 @@ class BinopApp(Expr):
 
 
 class ProcCall(Expr):
-    def __init__(self, proc_name, args, location=None):
+    def __init__(self, proc_name: str, args, location=None):
         self.proc_name = proc_name 
         self.args = args
         self.location = location
@@ -200,7 +200,7 @@ class Statement():
 
 
 class Vardecl(Statement):
-    def __init__(self, variable, type_, expression=Number(0), location=None):
+    def __init__(self, variable: Variable, type_, expression, location=None):
         self.variable = variable
         self.expression = expression # expr
         self.location = location
@@ -225,8 +225,8 @@ class Vardecl(Statement):
         current_state.declared_vars[-1][self.variable.name] = self
 
 class Assign(Statement):
-    def __init__(self, variable, expr, location=None):
-        self.variable = variable # expr
+    def __init__(self, variable: Variable, expr, location=None):
+        self.variable = variable
         self.expression = expr # expr
         self.location = location
 
@@ -318,6 +318,7 @@ class Block(Statement):
 class Return(Statement):
     def __init__(self, expression, location=None):
         self.expression = expression 
+        self.location = location
     
     def __str__(self):
         res = "return"
@@ -343,7 +344,7 @@ class Return(Statement):
                 
 
 class Procdecl(Statement):
-    def __init__(self, statements, name, argtype, rtt):
+    def __init__(self, statements, name: str, argtype, rtt):
         self.name = name
         self.argtype = argtype
         self.return_type = rtt
@@ -371,14 +372,14 @@ class Procdecl(Statement):
 
 
 class GlobalVardecl(Statement):
-    def __init__(self, variable, type_, value, location=None):
+    def __init__(self, variable: Variable, type_, value: Number, location=None):
         self.variable = variable
         self.value = value
         self.location = location
         self.type_ = type_
 
     def __str__(self):
-        return f"{str(self.type_)} {str(self.variable)} = {str(self.expression)}"
+        return f"{str(self.type_)} {str(self.variable)} = {str(self.value)}"
 
     def check_syntax(self, global_decls):
         # check that the type is valid
