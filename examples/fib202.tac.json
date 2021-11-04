@@ -3,6 +3,13 @@
     "proc": "@main",
     "body": [
       {
+        "opcode": "label",
+        "args": [
+          "%.L3"
+        ],
+        "result": null
+      },
+      {
         "opcode": "const",
         "args": [
           20
