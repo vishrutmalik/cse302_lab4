@@ -267,9 +267,11 @@ class CFG:
             if not(len(node.dests)==1 and self.prev(self.nodes[i+1])[-1]==node.label):
                 print("Jump Threading Unconditional not required")
                 return
+        for j in range(0)        
         self.entry.remove_lines(-2,-1)
         lab=self.nodes[-1].label
         self.entry.append_instrs({'opcode': 'jmp', 'args': [lab], 'result': None})
+        self.uce()
 
 
 
