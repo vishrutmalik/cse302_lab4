@@ -122,7 +122,7 @@ class Param():
 
 
 class Number(Expr):
-    def __init__(self, value, location=None):
+    def __init__(self, value: int, location=None):
         self.value = value
         self.location = location
         self.type_ = "int"
@@ -210,6 +210,19 @@ class ProcCall(Expr):
     def check_syntax(self, current_state: CheckState):
         for arg in self.args:
             arg.check_syntax(current_state)
+        
+        if self.proc_name == "print":
+            if len(self.args) != 1:
+                error_message(f"Incorrect number of args ({len(self.args)}) given for print: 1 expected", self.location)
+            
+            arg = self.args[0]
+            if arg.type_ == "int":
+                self.proc_name = "__bx_print_int"
+            elif arg.type_ == "bool":
+                self.proc_name = "__bx_print_bool"
+            else:
+                error_message(f"Unprintable type: {arg.type_}", self.location)
+
         typelist = [arg.type_ for arg in self.args]
 
         if self.proc_name not in current_state.declared_procs.keys():
@@ -267,6 +280,8 @@ class Assign(Statement):
         self.expression.check_syntax(current_state)
 
         if self.variable.type_ != self.expression.type_:
+            if self.expression.type_ == "void":
+                error_message(f"Tried to assign subroutine to variable {self.variable.name}", self.location)
             error_message(f"Variable {self.variable.name} with type {self.variable.type_}, \
                         is assigned to expression of type {self.expression.type_}", self.location)
 
@@ -409,9 +424,12 @@ class Procdecl(Statement):
 
     def check_syntax(self, current_state: CheckState):
         saw_return = False
-        ifs = []
         current_state.declared_vars.append(dict())
         current_state.rtt = self.return_type
+
+        if self.name.startswith("__bx_"):
+            error_message("Tried to define procedure starting with reserved keyword __bx_", self.location)
+
         for param in self.params:
             param.check_syntax(current_state)
 
@@ -422,6 +440,7 @@ class Procdecl(Statement):
         
         if not saw_return:
             error_message(f"{self.name}: return not found on all code paths", self.location)
+
         current_state.declared_vars.pop()
 
 
