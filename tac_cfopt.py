@@ -88,9 +88,9 @@ def main(fname, sname, coal, uce, jp1, jp2):
     with open(fname, 'r') as f:
         js_obj = json.load(f)
 
-    res = []
     tac=[]
     for proc in js_obj:
+        body = []
         new_proc = add_labels(proc)
         proc_name = new_proc["proc"]
         blocks = proc_to_blocks(new_proc)
@@ -103,15 +103,21 @@ def main(fname, sname, coal, uce, jp1, jp2):
             cfg.jp2()
         if not coal:
             cfg.coalesce()
-        tac+=cfg.serialize()
+        body += cfg.serialize()
 
-    # print(tac)
+        proc_json = {}
+        proc_json["proc"] = proc_name
+        if "args" in new_proc.keys():
+            proc_json["args"] = new_proc["args"]
+        proc_json["body"] = body 
+
+        tac.append(proc_json)
+
     if sname is None:
-        print(res)
+        print(tac)
     else:
         with open(sname, 'w') as f:
-            json.dump(res, f)
-    return cfg # this return is for testing purposes
+            json.dump(tac, f, indent=2)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
