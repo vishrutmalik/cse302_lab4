@@ -104,6 +104,34 @@ class testJP2(unittest.TestCase):
         del self.cfg3
 
 
+class testCoalescing(unittest.TestCase):
+    
+    def prepfile(self, fname):
+        with open(fname, 'r') as f:
+            js_obj = json.load(f)
+
+        proc = js_obj[0]
+        new_proc = add_labels(proc)
+        proc_name = new_proc["proc"]
+        blocks = proc_to_blocks(new_proc)
+        blocks = add_jumps(blocks)
+        nodes = create_nodes(blocks)
+        return CFG(proc_name, nodes)
+
+    def setUp(self):
+            fname1 = "./examples/coalescing.tac.json"
+            self.cfg1 = self.prepfile(fname1)
+
+    def test_coalesce_nodes(self):
+        print(self.cfg1)
+        self.assertEqual(len(self.cfg1.nodes), 5)
+        self.cfg1.coalesce()
+        self.assertEqual(len(self.cfg1.nodes), 3)
+    
+    def tearDown(self):
+        del self.cfg1
+
+
 class testSerialization(unittest.TestCase):
     
     def prepfile(self, fname):
@@ -147,6 +175,11 @@ class testSerialization(unittest.TestCase):
                 jmp_count += 1
         
         self.assertEqual(jmp_count, 2)
+    
+    def tearDown(self):
+        del self.cfg1
+        del self.cfg2
+        del self.cfg3
 
 if __name__ == "__main__":
     unittest.main()

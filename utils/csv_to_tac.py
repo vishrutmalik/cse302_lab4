@@ -83,4 +83,4 @@ if __name__ == "__main__":
             jname = args.fname + ".tac.json"
 
         with open(jname, 'w') as f:
-            json.dump(res, f, indent=4)
+            json.dump(res, f, indent=2)

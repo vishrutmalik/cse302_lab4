@@ -3,13 +3,6 @@
     "proc": "@main",
     "body": [
       {
-        "opcode": "label",
-        "args": [
-          "%.L3"
-        ],
-        "result": null
-      },
-      {
         "opcode": "const",
         "args": [
           20
@@ -64,13 +57,6 @@
           "%7"
         ],
         "result": "%6"
-      },
-      {
-        "opcode": "jmp",
-        "args": [
-          "%.L0"
-        ],
-        "result": null
       },
       {
         "opcode": "label",
