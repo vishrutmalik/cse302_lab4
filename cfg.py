@@ -97,7 +97,7 @@ class CFG:
 
     def next_node(self,node):
         ret=[]
-        for lab in self.dests:
+        for lab in node.dests:
             node=self.labels_to_nodes[lab]
             if node not in ret:
                 ret.append(node)
