@@ -281,10 +281,21 @@ class CFG:
             body+=node.instrs
             nl.extend(self.next_node(node))
         while len(ret_node)>0:
-            node=ret_node.peop()
+            node=ret_node.pop()
             if node in visited:
                 continue
             visited.add(node)
             body+=node.instrs
+            body=filter_fallthrough(body)
         return body
 
+def filter_fallthrough(body):
+    new_body=[]
+    init_length=len(body)
+    for i in range(0, init_length):
+        if body[i]["opcode"]=='jmp':
+            arg=body[i]["args"][-1]
+            if body[i+1]["opcode"]=="label" and body[i+1]["args"][-1]==arg:
+                continue
+        new_body.append(body[i])
+    return new_body

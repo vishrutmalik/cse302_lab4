@@ -44,15 +44,6 @@ def add_labels(proc):
     else:
         return {"proc":proc["proc"], "body":body}
 
-def filter_fallthrough(body):
-    new_body=[]
-    init_length=len(body)
-    for i in range(1, init_length):
-        if body[i]["opcode"]=='jmp':
-            arg=body[i]["args"][-1]
-            if body[i+1]["opcode"]=="label" and body[i+1]["args"][-1]==arg:
-                continue
-        new_body.append(body[i])
         
 
 
@@ -116,7 +107,6 @@ def main(fname, sname, coal, uce, jp1, jp2):
         if not coal:
             cfg.coalesce()
         body += cfg.serialize()
-
         proc_json = {}
         proc_json["proc"] = proc_name
         if "args" in new_proc.keys():
