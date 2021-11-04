@@ -33,7 +33,8 @@ def add_labels(proc):
         j = i + labels_added
         if body[j]["opcode"][0] == 'j':
             if i == init_length - 1 or (body[j+1]["opcode"] != "label" and
-                                        body[j+1]["opcode"][0] != 'j'):
+                                        body[j+1]["opcode"][0] != 'j' and 
+                                        body[j+1]["opcode"] != "ret"):
                 new_lbl, label_counter = new_label(labels, label_counter)
                 labels.add(new_lbl)
                 new_instr = {"opcode":"label", "args":[new_lbl], "result":None}
@@ -44,8 +45,6 @@ def add_labels(proc):
     else:
         return {"proc":proc["proc"], "body":body}
 
-        
-
 
 def proc_to_blocks(proc):
     blocks = []
@@ -53,8 +52,7 @@ def proc_to_blocks(proc):
     current_block = []
     for i, instr in enumerate(body):
         if i == len(body)-1 or \
-        (instr["opcode"][0] == 'j' and
-        body[i+1]["opcode"][0] != 'j') or \
+        (instr["opcode"][0] == 'j' and (body[i+1]["opcode"][0] != 'j' and body[i+1]["opcode"] != "ret")) or \
         instr["opcode"] == "ret":
             current_block.append(instr)
             blocks.append(current_block.copy())

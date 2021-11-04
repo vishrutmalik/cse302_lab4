@@ -123,7 +123,6 @@ class testCoalescing(unittest.TestCase):
             self.cfg1 = self.prepfile(fname1)
 
     def test_coalesce_nodes(self):
-        print(self.cfg1)
         self.assertEqual(len(self.cfg1.nodes), 5)
         self.cfg1.coalesce()
         self.assertEqual(len(self.cfg1.nodes), 3)
