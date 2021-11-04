@@ -103,5 +103,50 @@ class testJP2(unittest.TestCase):
         del self.cfg2
         del self.cfg3
 
+
+class testSerialization(unittest.TestCase):
+    
+    def prepfile(self, fname):
+        with open(fname, 'r') as f:
+            js_obj = json.load(f)
+
+        proc = js_obj[0]
+        new_proc = add_labels(proc)
+        proc_name = new_proc["proc"]
+        blocks = proc_to_blocks(new_proc)
+        blocks = add_jumps(blocks)
+        nodes = create_nodes(blocks)
+        return CFG(proc_name, nodes)
+
+    def setUp(self):
+            fname1 = "./examples/fib20.tac.json"
+            self.cfg1 = self.prepfile(fname1)
+
+            fname2 = "./examples/cond_jmps2.tac.json"
+            self.cfg2 = self.prepfile(fname2)
+
+            fname3 = "./examples/cond_update_temp.tac.json"
+            self.cfg3 = self.prepfile(fname3)
+
+    def test_remove_jmp(self):
+        self.cfg1.uce()
+        self.cfg1.jp2()
+        self.cfg1.coalesce()
+        res = self.cfg1.serialize()
+
+        jmp_count_init = 0
+        for node in self.cfg1.nodes:
+            for instr in node.instrs:
+                if instr["opcode"] == "jmp":
+                    jmp_count_init += 1
+        self.assertEqual(jmp_count_init, 3)
+
+        jmp_count = 0
+        for line in res:
+            if line["opcode"] == "jmp":
+                jmp_count += 1
+        
+        self.assertEqual(jmp_count, 2)
+
 if __name__ == "__main__":
     unittest.main()
