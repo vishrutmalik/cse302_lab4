@@ -94,11 +94,35 @@ class Variable(Expr):
             error_message(f"undeclared variable {self.name}", self.location)
         if var_type not in valid_types:
             error_message(f"invalid variable type: {var_type}", self.location)
+        if var_type == "void":
+            error_message(f"variable {self.name} cannot be of type void", self.location)
         self.type_ = var_type
 
 
+class Param():
+    def __init__(self, name: str, type_, location=None):
+        self.name = name
+        self.location = location 
+        self.type_ = type_
+    
+    def __str__(self):
+        return f"{self.name}: {self.type_}"
+    
+    def get_type(self):
+        return self.type_
+
+    def check_syntax(self, current_state):
+        # declaration twice in the same scope
+        if self.name in current_state.declared_vars[-1].keys():
+            if current_state.declared_vars[self.name].location is not None:
+                print(f"Info: initial declaration on line {current_state.declared_vars[self.name].location[0]}")
+            error_message(f"variable already declared: {self.name}", self.location)
+
+        current_state.declared_vars[-1][self.name] = self
+
+
 class Number(Expr):
-    def __init__(self, value, location=None):
+    def __init__(self, value: int, location=None):
         self.value = value
         self.location = location
         self.type_ = "int"
@@ -186,7 +210,23 @@ class ProcCall(Expr):
     def check_syntax(self, current_state: CheckState):
         for arg in self.args:
             arg.check_syntax(current_state)
+        
+        if self.proc_name == "print":
+            if len(self.args) != 1:
+                error_message(f"Incorrect number of args ({len(self.args)}) given for print: 1 expected", self.location)
+            
+            arg = self.args[0]
+            if arg.type_ == "int":
+                self.proc_name = "__bx_print_int"
+            elif arg.type_ == "bool":
+                self.proc_name = "__bx_print_bool"
+            else:
+                error_message(f"Unprintable type: {arg.type_}", self.location)
+
         typelist = [arg.type_ for arg in self.args]
+
+        if self.proc_name not in current_state.declared_procs.keys():
+            error_message(f"undeclared procedure {self.proc_name} called", self.location)
 
         proc_type, arg_types = current_state.declared_procs[self.proc_name]
         if typelist != arg_types:
@@ -205,6 +245,7 @@ class Vardecl(Statement):
         self.expression = expression # expr
         self.location = location
         self.type_ = type_
+        self.return_ = False
 
     def __str__(self):
         return f"{str(self.type_)} {str(self.variable)} = {str(self.expression)}"
@@ -229,6 +270,7 @@ class Assign(Statement):
         self.variable = variable
         self.expression = expr # expr
         self.location = location
+        self.return_ = False
 
     def __str__(self):
         return f"{str(self.variable)} = {str(self.expression)}"
@@ -238,6 +280,8 @@ class Assign(Statement):
         self.expression.check_syntax(current_state)
 
         if self.variable.type_ != self.expression.type_:
+            if self.expression.type_ == "void":
+                error_message(f"Tried to assign subroutine to variable {self.variable.name}", self.location)
             error_message(f"Variable {self.variable.name} with type {self.variable.type_}, \
                         is assigned to expression of type {self.expression.type_}", self.location)
 
@@ -246,6 +290,7 @@ class Ifelse(Statement):
     def __init__(self, condition, block, optelse, location=None):
         self.condition = condition # bool expr
         self.block = block 
+        self.return_ = False
         if optelse is not None:
             self.optelse = optelse
         else:
@@ -264,6 +309,10 @@ class Ifelse(Statement):
         self.optelse.check_syntax(current_state)
         if (self.condition.type_ != "bool"):
             error_message("condition of a if statement must be a boolean", self.location)
+        
+        # if there is a return on all paths then set return_ to true
+        if self.block.return_ and self.optelse.return_:
+            self.return_ = True
 
 
 class While(Statement):
@@ -271,6 +320,7 @@ class While(Statement):
         self.condition = condition
         self.block = block
         self.location = location
+        self.return_ = False
 
     def __str__(self):
         return f"while ({self.condition})" + "{\n" + str(self.block) + "}"
@@ -288,6 +338,7 @@ class Jump(Statement):
     def __init__(self, type_, location=None):
         self.type_ = type_
         self.location = location
+        self.return_ = False
 
     def __str__(self):
         return str(self.type_)
@@ -300,6 +351,7 @@ class Jump(Statement):
 
 class Block(Statement):
     def __init__(self, stmts):
+        self.return_ = False
         if stmts is not None:
             self.statements = stmts
         else:
@@ -312,6 +364,10 @@ class Block(Statement):
         current_state.declared_vars.append(dict())
         for s in self.statements:
             s.check_syntax(current_state)
+
+            # flag to indicate if block contains a return
+            if isinstance(s, Return):
+                self.return_ = True
         current_state.declared_vars.pop()
 
 
@@ -319,6 +375,7 @@ class Return(Statement):
     def __init__(self, expression, location=None):
         self.expression = expression 
         self.location = location
+        self.return_ = True
     
     def __str__(self):
         res = "return"
@@ -344,11 +401,13 @@ class Return(Statement):
                 
 
 class Procdecl(Statement):
-    def __init__(self, statements, name: str, argtype, rtt):
+    def __init__(self, name: str, params: list[Param], statements, rtt, location=None):
         self.name = name
-        self.argtype = argtype
+        self.params = params
+        self.argtype = [param.type_ for param in params] 
         self.return_type = rtt
         self.statements = statements
+        self.location = location
 
     def __str__(self):
         res = "\n".join(str(statement)
@@ -364,10 +423,24 @@ class Procdecl(Statement):
         proc_decls[self.name] = (self.argtype, self.return_type)
 
     def check_syntax(self, current_state: CheckState):
+        saw_return = False
         current_state.declared_vars.append(dict())
         current_state.rtt = self.return_type
+
+        if self.name.startswith("__bx_"):
+            error_message("Tried to define procedure starting with reserved keyword __bx_", self.location)
+
+        for param in self.params:
+            param.check_syntax(current_state)
+
         for statement in self.statements:
             statement.check_syntax(current_state)
+            if statement.return_:
+                saw_return = True
+        
+        if not saw_return:
+            error_message(f"{self.name}: return not found on all code paths", self.location)
+
         current_state.declared_vars.pop()
 
 
@@ -403,9 +476,15 @@ class GlobalVardecl(Statement):
 
 
 class GlobalScope():
-    def __init__(self, procedures, global_vars):
-        self.procedures = procedures
-        self.global_vars = global_vars
+    def __init__(self, declarations):
+        self.procedures = []
+        self.global_vars = []
+
+        for declaration in declarations:
+            if isinstance(declaration, Procdecl):
+                self.procedures.append(declaration)
+            elif isinstance(declaration, GlobalVardecl):
+                self.global_vars.append(declaration)
     
     def __str__(self):
         res = "\n".join(str(global_var)
