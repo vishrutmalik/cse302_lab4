@@ -1,17 +1,114 @@
 from os import scandir
-import py.ply.yacc as yacc
-import py.bxast as bxast
+import ply.yacc as yacc
+import bxast as bxast
 import sys
-from py.scanner import tokens
+from scanner import tokens
 
 # Program
 
 def p_program(p):
-    """program : DEF MAIN LPAREN RPAREN LBRACE stmts RBRACE"""
-    p[0] = bxast.Program(p[6])
+    """program : declstar"""
+    p[0] = bxast.GlobalScope(p[1])
+
+## decl
+def p_declstar(p):
+    """declstar : declstar decl
+                   | """
+    if len(p) == 1:
+            p[0] = []
+    else:
+            p[0] = p[1]
+            p[0].append(p[2])
+
+def p_decl(p):
+    """decl : vardecl
+                | procdecl """
+    p[0] = p[1]
+
+def p_vardecl(p):
+    """vardecl : VAR varinits COLON type SEMICOLON"""
+    p[0] = bxast.Vardecl(bxast.Variable(p[2], [p.lineno(1)]), p[6], p[4], [p.lineno(1)])
+
+def p_varinits(p):
+    """varinits : IDENT EQ expr varstar"""
+    p[0]=bxast.Variables(p[1],p[3],p[4])
+
+def p_varstar(p):
+    """varstar : varstar newvar
+                    | """
+    if len(p) == 1:
+            p[0] = []
+    else:
+            p[0] = p[1]
+            p[0].append(p[2])
+
+def p_newvar(p):
+    """newvar : COMMA IDENT EQ expr"""
+    p[0]=bxast.NewVar(p[2],p[4])
+
+def p_procdecl(p):
+    """procdecl : DEF IDENT LPAREN paramsq RPAREN tydeclq block"""
+    p[0] = bxast.Procdecl(p[1], p[3], p[7])
+
+def p_paramsq(p):
+    """paramsq : params 
+                |"""
+    if len(p)==0:
+        p[0]=[]
+    else:
+        p[0]=p[1]
+
+def p_params(p):
+    """params : param paramstar"""
+    p[0]=bxast.Args(p[1],p[2])
+
+def p_paramstar(p):
+    """paramstar : paramstar params2
+                    | """
+    if len(p) == 1:
+            p[0] = []
+    else:
+            p[0] = p[1]
+            p[0].append(p[2])
+
+def p_params2(p):
+    """params2 : COMMA param"""
+    p[0]=p[1]
+
+def p_param(p):
+    """param : IDENT morestar COLON type"""
+    p[0]=bxast.Param(p[1],p[2],p[4])
+
+def p_morestar(p):
+    """morestar : morestar newparam
+                    | """
+    if len(p) == 1:
+            p[0] = []
+    else:
+            p[0] = p[1]
+            p[0].append(p[2])
+
+def p_newparam(p):
+    """newparam : COMMA IDENT"""
+    p[0]=bxast.newParam(p[1])
+
+
+def p_eval(p):
+    """eval : expr SEMICOLON"""
+
+def p_tydeclq(p):
+    """tydeclq : tydecl
+                |"""
+    if len(p)==0:
+        p[0]=[]
+    else:
+        p[0]=p[1]
+
+def p_tydecl(p):
+    """tydecl : COLON type"""
+    p[0]=p[1]
 
 # Statements
-
 def p_statement(p):
     """stmt : vardecl
             | assign
@@ -31,11 +128,7 @@ def p_statements(p):
         p[0] = p[1]
         p[0].append(p[2])
 
-## Vardecl
 
-def p_vardecl(p):
-    """vardecl : VAR IDENT EQ expr COLON type SEMICOLON"""
-    p[0] = bxast.Vardecl(bxast.Variable(p[2], [p.lineno(1)]), p[6], p[4], [p.lineno(1)])
 
 ## Assign
 

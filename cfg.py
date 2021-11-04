@@ -95,6 +95,14 @@ class CFG:
         for node in self.nodes:
             self.edges[node.label]=node.dests
 
+    def next_node(self,node):
+        ret=[]
+        for lab in self.dests:
+            node=self.labels_to_nodes[lab]
+            if node not in ret:
+                ret.append(node)
+        return ret
+
     def next(self, node):
         """
         Polymorphic function that return the list of successors to a node
@@ -251,3 +259,32 @@ class CFG:
                     self.edges[label].append(edg)
                 self.delete_node(self.labels_to_nodes[self.edges[label][0]])
                 self.update_edges()
+                
+    def jp1(self):
+        # for node in self.nodes:
+        #     node.
+        pass
+
+    def serialize(self):
+        visited=set()
+        body=[]
+        nl=[self.entry]
+        ret_node=[]
+        while len(nl)>0:
+            node=nl.pop()
+            if node in visited:
+                continue
+            if len(node.dests)-len(node.cond_jumps)==0:
+                ret_node.append(node)
+                continue
+            visited.add(node)
+            body+=node.instrs
+            nl.extend(self.next_node(node))
+        while len(ret_node)>0:
+            node=ret_node.peop()
+            if node in visited:
+                continue
+            visited.add(node)
+            body+=node.instrs
+        return body
+

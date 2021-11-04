@@ -89,6 +89,7 @@ def main(fname, sname, coal, uce, jp1, jp2):
         js_obj = json.load(f)
 
     res = []
+    tac=[]
     for proc in js_obj:
         new_proc = add_labels(proc)
         proc_name = new_proc["proc"]
@@ -102,7 +103,9 @@ def main(fname, sname, coal, uce, jp1, jp2):
             cfg.jp2()
         if not coal:
             cfg.coalesce()
+        tac+=cfg.serialize()
 
+    # print(tac)
     if sname is None:
         print(res)
     else:

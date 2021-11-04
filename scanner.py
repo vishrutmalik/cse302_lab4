@@ -5,14 +5,14 @@ Created on Wed Sep 20 12:35:30 2021
 """
 
 import re
-import py.ply.lex as lex
+import ply.lex as lex
 import sys
 
 
 reserved = {
-    'print': 'PRINT',
+    # 'print': 'PRINT',
     'def': 'DEF',
-    'main': 'MAIN',
+    # 'main': 'MAIN',
     'int': 'INT',
     'var': 'VAR',
     'if' : 'IF',
@@ -22,11 +22,13 @@ reserved = {
     'break' : 'BREAK',
     'continue' : 'CONTINUE',
     'true' : 'TRUE',
-    'false' : 'FALSE'
+    'false' : 'FALSE',
+    'return' : 'RETURN',
+    'void' : 'VOID'
 }
 
 tokens = (
-    'LPAREN', 'RPAREN', 'SEMICOLON', 'EQ', 'LBRACE', 'RBRACE', 'COLON',
+    'LPAREN', 'RPAREN', 'SEMICOLON', 'EQ', 'LBRACE', 'RBRACE', 'COLON', 'COMMA'
     'PLUS', 'MINUS', 'TIMES', 'DIV', 'MODULUS',
     'BITAND', 'BITOR', 'BITXOR', 'LT', 'GT', 'BITCOMPL','IDENT', 'NUMBER', 'BOOLNOT', 'BOOLOR', 'BOOLAND', 'BOOLEQ', 'NEQUALS', 'SHL', 'SHR', 'GTE', 'LTE'
 ) + tuple(reserved.values())
@@ -60,6 +62,7 @@ t_BITOR = r'\|'
 t_LBRACE = r'\{'
 t_RBRACE = r'\}'
 t_COLON = r'\:'
+t_COMMA = r','
 t_PLUS = r'\+'
 t_MINUS = '-'
 t_TIMES = r'\*'
@@ -78,7 +81,7 @@ def t_IDENT(t):
     return t
 
 def t_NUMBER(t):
-    r'0|[1-9][0-9]*'
+    r'0|-?[1-9][0-9]*'
     # t.type == 'NUMBER'
     t.value = int(t.value)
     if not (0 <= t.value < (1<<63)):
