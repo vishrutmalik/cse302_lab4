@@ -261,9 +261,18 @@ class CFG:
                 self.update_edges()
                 
     def jp1(self):
-        # for node in self.nodes:
-        #     node.
-        pass
+        init_len=len(self.nodes)
+        for i in range(0,init_len):
+            node=self.nodes[i]
+            if not(len(node.dests)==1 and self.prev(self.nodes[i+1])[-1]==node.label):
+                print("Jump Threading Unconditional not required")
+                return
+        self.entry.remove_lines(-2,-1)
+        lab=self.nodes[-1].label
+        self.entry.append_instrs({'opcode': 'jmp', 'args': [lab], 'result': None})
+
+
+
 
     def serialize(self):
         visited=set()
