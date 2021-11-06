@@ -227,7 +227,7 @@ class CFG:
         self.update_edges()
         self.uce()
 
-    def coalesce(self):
+    def coalesce_aux(self):
         # for node in self.nodes:
         #     if len(node.dests) == 1 and len(self.prev(node.dests[0])) == 1:
         #         B2 = self.labels_to_nodes[node.dests[0]]
@@ -244,11 +244,24 @@ class CFG:
         #we just shift the properties to the parent node after removing jmp instr
         print(self.edges)
         i=1
+        nl=[]
+        jl=[]
         for label in self.edges.keys():
             print(i,label)
             i+=1
             if len(self.edges[label]) ==1 and self.prev(self.labels_to_nodes[self.edges[label][0]])==[label]:
                 print("ok")
+                nl.append(label)
+                nl.append(self.edges[label][0])
+                jl.append(nl)
+                nl=[]
+        return jl
+    
+    def coalesce(self):
+        jl=self.coalesce_aux()
+        for ls in jl:
+            if len(ls)==2:
+                label=ls[0]
                 linstr=self.labels_to_nodes[label].last_instr()
                 print(linstr)
                 if linstr["opcode"]=='jmp':
@@ -258,8 +271,11 @@ class CFG:
                 for edg in self.edges[self.edges[label][0]]:
                     self.edges[label].append(edg)
                 self.delete_node(self.labels_to_nodes[self.edges[label][0]])
-                self.update_edges()
-                
+                self.update_edges()            
+
+
+
+
     def jp1_aux(self):
         """creates a node list of all the linear sequences inside the cfg"""
         # init_len=len(self.nodes)
