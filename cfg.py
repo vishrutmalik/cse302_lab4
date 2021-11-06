@@ -234,29 +234,15 @@ class CFG:
         self.uce()
 
     def coalesce_aux(self):
-        # for node in self.nodes:
-        #     if len(node.dests) == 1 and len(self.prev(node.dests[0])) == 1:
-        #         B2 = self.labels_to_nodes[node.dests[0]]
-        #         linstr = node.last_instr()
-        #         if linstr["opcode"] == "jmp":
-        #             node.remove_lines(-2, -1)
-        #         new_body = B2.instrs
-        #         node.append_instrs(new_body)
-        #         for edg in self.edges[B2.label]:
-        #             self.edges[node.label].append(edg)
-        #         self.delete_node(B2)
-        #         self.update_edges()
-
-        #we just shift the properties to the parent node after removing jmp instr
-        print(self.edges)
+        # print(self.edges)
         i=1
         nl=[]
         jl=[]
         for label in self.edges.keys():
-            print(i,label)
+            # print(i,label)
             i+=1
             if len(self.edges[label]) ==1 and self.prev(self.labels_to_nodes[self.edges[label][0]])==[label]:
-                print("ok")
+                # print("ok")
                 nl.append(label)
                 nl.append(self.edges[label][0])
                 jl.append(nl)
@@ -267,13 +253,13 @@ class CFG:
         jl=self.coalesce_aux()
         init_len=len(jl)
         while init_len>0:
-            print(jl)
+            # print(jl)
             ls=jl[0]
             if len(ls)==2:
                 # print(ls)
                 label=ls[0]
                 linstr=self.labels_to_nodes[label].last_instr()
-                print(linstr)
+                # print(linstr)
                 if linstr["opcode"]=='jmp':
                     self.labels_to_nodes[label].remove_lines(-2,-1)
                 new_body=self.labels_to_nodes[self.edges[label][0]].instrs
@@ -286,24 +272,13 @@ class CFG:
                 self.update_edges()
             init_len-=1
             jl=self.coalesce_aux()    
-        print(self.edges)
-        print(self.labels_to_nodes['%.L4'].instrs)
+        # print(self.edges)
+        # print(self.labels_to_nodes['%.L4'].instrs)
 
 
 
     def jp1_aux(self):
         """creates a node list of all the linear sequences inside the cfg"""
-        # init_len=len(self.nodes)
-        # for i in range(0,init_len):
-        #     node=self.nodes[i]
-        #     if not(len(node.dests)==1 and self.prev(self.nodes[i+1])[-1]==node.label):
-        #         print("Jump Threading Unconditional not required")
-        #         return
-        # for j in range(0)        
-        # self.entry.remove_lines(-2,-1)
-        # lab=self.nodes[-1].label
-        # self.entry.append_instrs({'opcode': 'jmp', 'args': [lab], 'result': None})
-        # self.uce()
         init_len=len(self.nodes)
         nl=[]
         jl=[]

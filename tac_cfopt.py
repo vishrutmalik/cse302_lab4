@@ -98,7 +98,7 @@ def main(fname, sname, coal, uce, jp1, jp2):
         blocks = add_jumps(blocks)
         nodes = create_nodes(blocks)
         cfg = CFG(proc_name, nodes)
-        print(cfg.edges)
+        # print(cfg.edges)
         if not uce:
             cfg.uce()
         if not jp2:
