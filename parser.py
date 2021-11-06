@@ -142,6 +142,20 @@ def p_print(p):
     """print : PRINT LPAREN expr RPAREN SEMICOLON"""
     p[0] = bxast.Print(p[3], [p.lineno(1)])
 
+## Return
+
+def p_return(p):
+    """return : RETURN exprq SEMICOLON"""
+    p[0] = p[2]
+
+def p_exprq(p):
+    """exprq : expr 
+                |"""
+    if len(p)==0:
+        p[0]=[]
+    else:
+        p[0]=p[1]
+
 ## Ifelse
 
 def p_ifelse(p):
@@ -285,6 +299,39 @@ def p_expr_booland(p):
 def p_expr_boolor(p):
     """expr : expr BOOLOR expr"""
     p[0] = bxast.BinopApp(bxast.BinOp('BOOLOR', [p.lineno(2)]), p[1], p[3], [p.lineno(2)])
+
+## Procedure Calls
+
+def p_expr_procedure(p):
+    """expr : IDENT LPAREN exprsq RPAREN"""
+    p[0] = bxast.ExprProcedureCall(p[1],p[3])
+
+
+def p_exprsq(p):
+    """exprsq : exprs 
+                |"""
+    if len(p)==0:
+        p[0]=[]
+    else:
+        p[0]=p[1]
+
+def p_exprs(p):
+    """exprs : expr exprstar"""
+    p[0]=bxast.Args(p[1],p[2])
+
+def p_exprstar(p):
+    """exprstar : exprstar exprs2
+                    | """
+    if len(p) == 1:
+            p[0] = []
+    else:
+            p[0] = p[1]
+            p[0].append(p[2])
+
+def p_exprs2(p):
+    """exprs2 : COMMA expr"""
+    p[0]=p[1]
+
 
 ## Unary Operators
 
