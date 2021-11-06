@@ -4,7 +4,21 @@
     "args": [],
     "body": [
       {
+        "opcode": "label",
+        "args": [
+          "%.L1"
+        ],
+        "result": null
+      },
+      {
         "opcode": "jmp",
+        "args": [
+          "%.L4"
+        ],
+        "result": null
+      },
+      {
+        "opcode": "label",
         "args": [
           "%.L4"
         ],

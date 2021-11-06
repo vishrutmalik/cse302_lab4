@@ -69,6 +69,8 @@ class Node:
             assert startline < endline
             self.instrs = self.instrs[:startline] + self.instrs[endline:]
 
+    def remove_last_instr(self):
+        self.instrs.pop()
 
 class CFG:
     def __init__(self,proc,nodes):
@@ -258,13 +260,16 @@ class CFG:
             if len(ls)==2:
                 # print(ls)
                 label=ls[0]
+                # print("Before this operation, my label is", self.labels_to_nodes[label].instrs[0])
                 linstr=self.labels_to_nodes[label].last_instr()
-                # print(linstr)
+                # print("And my last instr is",linstr)
                 if linstr["opcode"]=='jmp':
-                    self.labels_to_nodes[label].remove_lines(-2,-1)
+                    self.labels_to_nodes[label].remove_last_instr()
                 new_body=self.labels_to_nodes[self.edges[label][0]].instrs
+                # print(new_body[0])
                 del new_body[0]
                 self.labels_to_nodes[label].append_instrs(new_body)
+                # print("After this operation, my label is", self.labels_to_nodes[label].instrs[0])
                 for edg in self.edges[self.edges[label][0]]:
                     self.edges[label].append(edg)
                 self.delete_node(self.labels_to_nodes[self.edges[label][0]])
