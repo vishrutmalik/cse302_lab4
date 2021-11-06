@@ -260,20 +260,42 @@ class CFG:
                 self.delete_node(self.labels_to_nodes[self.edges[label][0]])
                 self.update_edges()
                 
-    def jp1(self):
+    def jp1_aux(self):
+        """creates a node list of all the linear sequences inside the cfg"""
+        # init_len=len(self.nodes)
+        # for i in range(0,init_len):
+        #     node=self.nodes[i]
+        #     if not(len(node.dests)==1 and self.prev(self.nodes[i+1])[-1]==node.label):
+        #         print("Jump Threading Unconditional not required")
+        #         return
+        # for j in range(0)        
+        # self.entry.remove_lines(-2,-1)
+        # lab=self.nodes[-1].label
+        # self.entry.append_instrs({'opcode': 'jmp', 'args': [lab], 'result': None})
+        # self.uce()
         init_len=len(self.nodes)
+        nl=[]
+        jl=[]
         for i in range(0,init_len):
             node=self.nodes[i]
-            if not(len(node.dests)==1 and self.prev(self.nodes[i+1])[-1]==node.label):
-                print("Jump Threading Unconditional not required")
-                return
-        for j in range(0)        
-        self.entry.remove_lines(-2,-1)
-        lab=self.nodes[-1].label
-        self.entry.append_instrs({'opcode': 'jmp', 'args': [lab], 'result': None})
-        self.uce()
+            nl.append(node)
+            if len(node.dests)==1 and self.prev(self.nodes[i+1])[-1]==node.label and node.last_instr()["opcode"] == "jmp":
+                continue
+            else:
+                jl.append(nl)
+                nl=[]
+        return jl
+                
 
-
+    def jp1(self):
+        jl=self.jp1_aux()
+        for ls in jl:
+            if len(ls)>2:
+                first=jl[0]
+                first.remove_lines(-2,-1)
+                label=ls[-1].label()
+                first.append_instrs({'opcode': 'jmp', 'args': [label], 'result': None})
+                self.uce()
 
 
     def serialize(self):
