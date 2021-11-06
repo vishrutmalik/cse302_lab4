@@ -1,0 +1,28 @@
+[
+  {
+    "proc": "@main",
+    "args": [],
+    "body": [
+      {
+        "opcode": "jmp",
+        "args": [
+          "%.L4"
+        ],
+        "result": null
+      },
+      {
+        "opcode": "jz",
+        "args": [
+          "%1",
+          "%.L4"
+        ],
+        "result": ""
+      },
+      {
+        "opcode": "ret",
+        "args": [],
+        "result": null
+      }
+    ]
+  }
+]

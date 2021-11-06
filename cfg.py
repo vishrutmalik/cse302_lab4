@@ -277,6 +277,7 @@ class CFG:
                 if linstr["opcode"]=='jmp':
                     self.labels_to_nodes[label].remove_lines(-2,-1)
                 new_body=self.labels_to_nodes[self.edges[label][0]].instrs
+                del new_body[0]
                 self.labels_to_nodes[label].append_instrs(new_body)
                 for edg in self.edges[self.edges[label][0]]:
                     self.edges[label].append(edg)
@@ -285,7 +286,8 @@ class CFG:
                 self.update_edges()
             init_len-=1
             jl=self.coalesce_aux()    
-
+        print(self.edges)
+        print(self.labels_to_nodes['%.L4'].instrs)
 
 
 
