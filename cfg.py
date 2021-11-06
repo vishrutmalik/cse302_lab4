@@ -94,6 +94,8 @@ class CFG:
         self.edges=dict()
         for node in self.nodes:
             self.edges[node.label]=node.dests
+        self.nodes_to_labels = {node:node.label for node in self.nodes}
+        self.labels_to_nodes = {node.label:node for node in self.nodes}
 
     def next_node(self,node):
         ret=[]
@@ -144,7 +146,11 @@ class CFG:
         """
         if isinstance(node, str):
             node = self.labels_to_nodes[node]
+        label=node.label
         self.nodes.remove(node)
+        del self.edges[label]
+        self.update_edges()
+        self.entry = self.nodes[0]
 
     def remove_edge(self,src,dest):
         """
@@ -259,8 +265,12 @@ class CFG:
     
     def coalesce(self):
         jl=self.coalesce_aux()
-        for ls in jl:
+        init_len=len(jl)
+        while init_len>0:
+            print(jl)
+            ls=jl[0]
             if len(ls)==2:
+                # print(ls)
                 label=ls[0]
                 linstr=self.labels_to_nodes[label].last_instr()
                 print(linstr)
@@ -271,7 +281,10 @@ class CFG:
                 for edg in self.edges[self.edges[label][0]]:
                     self.edges[label].append(edg)
                 self.delete_node(self.labels_to_nodes[self.edges[label][0]])
-                self.update_edges()            
+                self.edges[label].remove(ls[1])
+                self.update_edges()
+            init_len-=1
+            jl=self.coalesce_aux()    
 
 
 
