@@ -69,6 +69,8 @@ class Node:
             assert startline < endline
             self.instrs = self.instrs[:startline] + self.instrs[endline:]
 
+    def remove_last_instr(self):
+        self.instrs.pop()
 
 class CFG:
     def __init__(self,proc,nodes):
@@ -94,6 +96,8 @@ class CFG:
         self.edges=dict()
         for node in self.nodes:
             self.edges[node.label]=node.dests
+        self.nodes_to_labels = {node:node.label for node in self.nodes}
+        self.labels_to_nodes = {node.label:node for node in self.nodes}
 
     def next_node(self,node):
         ret=[]
@@ -144,7 +148,11 @@ class CFG:
         """
         if isinstance(node, str):
             node = self.labels_to_nodes[node]
+        label=node.label
         self.nodes.remove(node)
+        del self.edges[label]
+        self.update_edges()
+        self.entry = self.nodes[0]
 
     def remove_edge(self,src,dest):
         """
@@ -227,53 +235,78 @@ class CFG:
         self.update_edges()
         self.uce()
 
-    def coalesce(self):
-        # for node in self.nodes:
-        #     if len(node.dests) == 1 and len(self.prev(node.dests[0])) == 1:
-        #         B2 = self.labels_to_nodes[node.dests[0]]
-        #         linstr = node.last_instr()
-        #         if linstr["opcode"] == "jmp":
-        #             node.remove_lines(-2, -1)
-        #         new_body = B2.instrs
-        #         node.append_instrs(new_body)
-        #         for edg in self.edges[B2.label]:
-        #             self.edges[node.label].append(edg)
-        #         self.delete_node(B2)
-        #         self.update_edges()
-
-        #we just shift the properties to the parent node after removing jmp instr
-        print(self.edges)
+    def coalesce_aux(self):
+        # print(self.edges)
         i=1
+        nl=[]
+        jl=[]
         for label in self.edges.keys():
-            print(i,label)
+            # print(i,label)
             i+=1
             if len(self.edges[label]) ==1 and self.prev(self.labels_to_nodes[self.edges[label][0]])==[label]:
-                print("ok")
+                # print("ok")
+                nl.append(label)
+                nl.append(self.edges[label][0])
+                jl.append(nl)
+                nl=[]
+        return jl
+    
+    def coalesce(self):
+        jl=self.coalesce_aux()
+        init_len=len(jl)
+        while init_len>0:
+            # print(jl)
+            ls=jl[0]
+            if len(ls)==2:
+                # print(ls)
+                label=ls[0]
+                # print("Before this operation, my label is", self.labels_to_nodes[label].instrs[0])
                 linstr=self.labels_to_nodes[label].last_instr()
-                print(linstr)
+                # print("And my last instr is",linstr)
                 if linstr["opcode"]=='jmp':
-                    self.labels_to_nodes[label].remove_lines(-2,-1)
+                    self.labels_to_nodes[label].remove_last_instr()
                 new_body=self.labels_to_nodes[self.edges[label][0]].instrs
+                # print(new_body[0])
+                del new_body[0]
                 self.labels_to_nodes[label].append_instrs(new_body)
+                # print("After this operation, my label is", self.labels_to_nodes[label].instrs[0])
                 for edg in self.edges[self.edges[label][0]]:
                     self.edges[label].append(edg)
                 self.delete_node(self.labels_to_nodes[self.edges[label][0]])
+                self.edges[label].remove(ls[1])
                 self.update_edges()
-                
-    def jp1(self):
+            init_len-=1
+            jl=self.coalesce_aux()    
+        # print(self.edges)
+        # print(self.labels_to_nodes['%.L4'].instrs)
+
+
+
+    def jp1_aux(self):
+        """creates a node list of all the linear sequences inside the cfg"""
         init_len=len(self.nodes)
+        nl=[]
+        jl=[]
         for i in range(0,init_len):
             node=self.nodes[i]
-            if not(len(node.dests)==1 and self.prev(self.nodes[i+1])[-1]==node.label):
-                print("Jump Threading Unconditional not required")
-                return
-        for j in range(0)        
-        self.entry.remove_lines(-2,-1)
-        lab=self.nodes[-1].label
-        self.entry.append_instrs({'opcode': 'jmp', 'args': [lab], 'result': None})
-        self.uce()
+            nl.append(node)
+            if len(node.dests)==1 and self.prev(self.nodes[i+1])[-1]==node.label and node.last_instr()["opcode"] == "jmp":
+                continue
+            else:
+                jl.append(nl)
+                nl=[]
+        return jl
+                
 
-
+    def jp1(self):
+        jl=self.jp1_aux()
+        for ls in jl:
+            if len(ls)>2:
+                first=jl[0]
+                first.remove_lines(-2,-1)
+                label=ls[-1].label()
+                first.append_instrs({'opcode': 'jmp', 'args': [label], 'result': None})
+                self.uce()
 
 
     def serialize(self):
