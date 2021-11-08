@@ -76,7 +76,7 @@ def p_paramstar(p):
 def p_param(p):
     """param : IDENT morestar COLON type"""
     p[0] = [bxast.Param(name, p[4], location) for name, location in p[2]]
-    p[0].append(bxast.Param(p[1], p[4], [p.lineno(1)])) 
+    p[0] = [bxast.Param(p[1], p[4], [p.lineno(1)])] + p[0]
 
 def p_morestar(p):
     """morestar : morestar COMMA IDENT
