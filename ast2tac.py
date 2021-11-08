@@ -189,7 +189,11 @@ def expression_to_code(e, x, local_vars):
                 res.append({"opcode":"param", "args":[i+1, y], "result":None})
 
         name = '@' + e.proc_name
-        res.append({"opcode":"call", "args":[name, len(e.args)], "result":x})
+        if e.type_ == "void":
+            result = None
+        else:
+            result = x
+        res.append({"opcode":"call", "args":[name, len(e.args)], "result":result})
         return res
 
 
@@ -295,8 +299,7 @@ def statement_to_code(s, local_vars: Muncher):
         sys.exit(1)
     
     if isinstance(s, Eval):
-        x = fresh()
-        return expression_to_code(s.expression, x, local_vars)
+        return expression_to_code(s.expression, None, local_vars)
     
     if isinstance(s, Return):
         if s.expression is None:

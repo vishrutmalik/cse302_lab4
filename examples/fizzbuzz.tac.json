@@ -180,13 +180,13 @@
     "args": [
      151515
     ],
-    "result": "%11"
+    "result": "%10"
    },
    {
     "opcode": "param",
     "args": [
      1,
-     "%11"
+     "%10"
     ],
     "result": null
    },
@@ -196,7 +196,7 @@
      "@__bx_print_int",
      1
     ],
-    "result": "%10"
+    "result": null
    },
    {
     "opcode": "jmp",
@@ -217,13 +217,13 @@
     "args": [
      333
     ],
-    "result": "%13"
+    "result": "%11"
    },
    {
     "opcode": "param",
     "args": [
      1,
-     "%13"
+     "%11"
     ],
     "result": null
    },
@@ -233,7 +233,7 @@
      "@__bx_print_int",
      1
     ],
-    "result": "%12"
+    "result": null
    },
    {
     "opcode": "label",
@@ -261,42 +261,42 @@
     "args": [
      "%cur"
     ],
-    "result": "%16"
+    "result": "%14"
    },
    {
     "opcode": "const",
     "args": [
      5
     ],
-    "result": "%17"
+    "result": "%15"
    },
    {
     "opcode": "mod",
     "args": [
-     "%16",
-     "%17"
+     "%14",
+     "%15"
     ],
-    "result": "%14"
+    "result": "%12"
    },
    {
     "opcode": "const",
     "args": [
      0
     ],
-    "result": "%15"
+    "result": "%13"
    },
    {
     "opcode": "sub",
     "args": [
-     "%14",
-     "%15"
+     "%12",
+     "%13"
     ],
-    "result": "%14"
+    "result": "%12"
    },
    {
     "opcode": "jz",
     "args": [
-     "%14",
+     "%12",
      "%.L9"
     ],
     "result": null
@@ -320,13 +320,13 @@
     "args": [
      555
     ],
-    "result": "%19"
+    "result": "%16"
    },
    {
     "opcode": "param",
     "args": [
      1,
-     "%19"
+     "%16"
     ],
     "result": null
    },
@@ -336,7 +336,7 @@
      "@__bx_print_int",
      1
     ],
-    "result": "%18"
+    "result": null
    },
    {
     "opcode": "jmp",
@@ -366,7 +366,7 @@
      "@__bx_print_int",
      1
     ],
-    "result": "%20"
+    "result": null
    },
    {
     "opcode": "label",
@@ -387,20 +387,20 @@
     "args": [
      "%cur"
     ],
-    "result": "%21"
+    "result": "%17"
    },
    {
     "opcode": "const",
     "args": [
      1
     ],
-    "result": "%22"
+    "result": "%18"
    },
    {
     "opcode": "add",
     "args": [
-     "%21",
-     "%22"
+     "%17",
+     "%18"
     ],
     "result": "%cur"
    },
@@ -429,13 +429,13 @@
     "args": [
      0
     ],
-    "result": "%24"
+    "result": "%19"
    },
    {
     "opcode": "param",
     "args": [
      1,
-     "%24"
+     "%19"
     ],
     "result": null
    },
@@ -444,13 +444,13 @@
     "args": [
      100
     ],
-    "result": "%25"
+    "result": "%20"
    },
    {
     "opcode": "param",
     "args": [
      2,
-     "%25"
+     "%20"
     ],
     "result": null
    },
@@ -460,7 +460,7 @@
      "@fizzbuzz",
      2
     ],
-    "result": "%23"
+    "result": null
    }
   ]
  }
