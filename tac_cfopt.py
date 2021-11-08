@@ -85,9 +85,7 @@ def create_nodes(blocks):
     return nodes
 
 
-def main(fname, sname, coal, uce, jp1, jp2):
-    with open(fname, 'r') as f:
-        js_obj = json.load(f)
+def main(js_obj, sname=None, coal=False, uce=False, jp1=True, jp2=False):
 
     tac=[]
     for proc in js_obj:
@@ -101,6 +99,8 @@ def main(fname, sname, coal, uce, jp1, jp2):
         # print(cfg.edges)
         if not uce:
             cfg.uce()
+        if not jp1:
+            cfg.jp1()
         if not jp2:
             cfg.jp2()
         if not coal:
@@ -115,7 +115,7 @@ def main(fname, sname, coal, uce, jp1, jp2):
         tac.append(proc_json)
 
     if sname is None:
-        print(tac)
+        return tac
     else:
         with open(sname, 'w') as f:
             json.dump(tac, f, indent=2)
@@ -130,5 +130,8 @@ if __name__ == "__main__":
     parser.add_argument("--disable-jp2", action="store_true", required=False)
     args = parser.parse_args()
 
-    cfg = main(args.fname, args.o, args.disable_coal, args.disable_uce,
+    with open(args.fname, 'r') as f:
+        js_obj = json.load(f)
+
+    cfg = main(js_obj, args.o, args.disable_coal, args.disable_uce,
          args.disable_jp1, args.disable_jp2)

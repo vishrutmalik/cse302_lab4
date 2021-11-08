@@ -9,7 +9,8 @@ from scanner import lexer
 from parser import parser
 import sys
 import json
-import ast2tac as ast2tac
+import ast2tac
+import bx2front
 
 def loadfile(fn):
     with open(fn, 'r') as f:
@@ -26,8 +27,7 @@ def to_tac(filename, keep_tac):
     else:
         raise ValueError(f'{filename} does not end in .bx')
 
-    # print(f"{filename} being processed")
-    ast=loadfile(filename)
+    ast = bx2front.get_ast(filename)
     ast.check_syntax()
 
     tac = ast2tac.program2tac(ast)
