@@ -1,0 +1,4 @@
+def main() {
+  // a simple line comment
+  print(42);
+}
