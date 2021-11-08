@@ -216,17 +216,21 @@ def statement_to_code(s, local_vars: Muncher):
             sys.exit(1)
 
     if isinstance(s, Vardecl):
-        y = fresh()
-        local_vars[s.variable.name] = y
+        res = []
+        for variable, expression in s.variables:
+            y = fresh()
+            local_vars[variable.name] = y
 
-        if isinstance(s.expression, Variable):
-            x = local_vars[s.expression.name]
-            return [{"opcode":"copy", "args":[x], "result":y}] 
+            if isinstance(expression, Variable):
+                x = local_vars[expression.name]
+                res += [{"opcode":"copy", "args":[x], "result":y}] 
+                continue
 
-        x = fresh()
-        e1 = expression_to_code(s.expression, x, local_vars)
+            x = fresh()
+            e1 = expression_to_code(expression, x, local_vars)
 
-        return e1 + [{"opcode":"copy", "args":[x], "result":y}]
+            res += e1 + [{"opcode":"copy", "args":[x], "result":y}]
+        return res
 
     if isinstance(s, Block):
         res = []
@@ -278,6 +282,10 @@ def statement_to_code(s, local_vars: Muncher):
         print(f"Unrecognized jump type {s.type_}, line {s.location[0]}")
         sys.exit(1)
     
+    if isinstance(s, Eval):
+        x = fresh()
+        return expression_to_code(s.expression, x, local_vars)
+    
     if isinstance(s, Return):
         if s.expression is None:
             return [{"opcode":"ret", "args":[], "result":None}]
@@ -299,9 +307,12 @@ def statement_to_code(s, local_vars: Muncher):
 
 
 def global_to_code(vardecl: GlobalVardecl, local_vars: Muncher):
-    name = '@' + vardecl.variable.name
-    local_vars[vardecl.variable.name] = name
-    return {"var": name, "init": vardecl.value.value}
+    res = []
+    for variable, expression in vardecl.variables:
+        name = '@' + variable.name
+        local_vars[variable.name] = name
+        res.append({"var": name, "init": expression.value})
+    return res 
 
 
 def procdecl_to_code(procdecl: Procdecl, local_vars: Muncher):
@@ -319,11 +330,12 @@ def procdecl_to_code(procdecl: Procdecl, local_vars: Muncher):
     local_vars.remove_scope()
     return {"proc": procname, "args": procargs, "body": body}
 
+
 def program2tac(ast: GlobalScope):
     tac = []
     localvars = Muncher()
     for global_var in ast.global_vars:
-        tac.append(global_to_code(global_var, localvars))
+        tac += global_to_code(global_var, localvars)
     for procdecl in ast.procedures:
         tac.append(procdecl_to_code(procdecl, localvars))
     return tac

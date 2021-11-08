@@ -197,7 +197,7 @@ class BinopApp(Expr):
 
 
 class ProcCall(Expr):
-    def __init__(self, proc_name: str, args, location=None):
+    def __init__(self, proc_name: str, args: list[Expr], location=None):
         self.proc_name = proc_name 
         self.args = args
         self.location = location
@@ -240,30 +240,33 @@ class Statement():
 
 
 class Vardecl(Statement):
-    def __init__(self, variable: Variable, type_, expression, location=None):
-        self.variable = variable
-        self.expression = expression # expr
+    def __init__(self, variables: list[tuple[Variable, Expr]], type_, location=None):
+        self.variables = variables
         self.location = location
         self.type_ = type_
         self.return_ = False
 
     def __str__(self):
-        return f"{str(self.type_)} {str(self.variable)} = {str(self.expression)}"
+        res = ""
+        for variable, expression in self.variables:
+            res += f"{str(self.type_)} {str(variable)} = {str(expression)}"
+        return res 
 
     def check_syntax(self, current_state: CheckState):
-        self.expression.check_syntax(current_state)
+        for variable, expression in self.variables:
+            expression.check_syntax(current_state)
 
-        # declaration twice in the same block
-        if self.variable.name in current_state.declared_vars[-1].keys():
-            if current_state.declared_vars[self.variable.name].location is not None:
-                print(f"Info: initial declaration on line {current_state.declared_vars[self.variable.name].location[0]}")
-            error_message(f"variable already declared: {self.variable.name}", self.location)
+            # declaration twice in the same block
+            if variable.name in current_state.declared_vars[-1].keys():
+                if current_state.declared_vars[variable.name].location is not None:
+                    print(f"Info: initial declaration on line {current_state.declared_vars[variable.name].location[0]}")
+                error_message(f"variable already declared: {variable.name}", self.location)
 
-        # changing type of variable after declaration
-        if self.type_ != self.expression.type_:
-            error_message(f"cannot declare {self.expression.type_} value as {self.type_}", self.location)
+            # changing type of variable after declaration
+            if self.type_ != expression.type_:
+                error_message(f"cannot declare {expression.type_} value as {self.type_}", self.location)
 
-        current_state.declared_vars[-1][self.variable.name] = self
+            current_state.declared_vars[-1][variable.name] = self
 
 class Assign(Statement):
     def __init__(self, variable: Variable, expr, location=None):
@@ -371,6 +374,19 @@ class Block(Statement):
         current_state.declared_vars.pop()
 
 
+class Eval(Statement):
+    def __init__(self, expression, location=None):
+        self.expression = expression
+        self.location = location
+        self.return_ = False 
+
+    def __str__(self):
+        return f"{str(self.expression)};"
+    
+    def check_syntax(self, current_state: CheckState):
+        self.expression.check_syntax(current_state)
+
+
 class Return(Statement):
     def __init__(self, expression, location=None):
         self.expression = expression 
@@ -445,34 +461,37 @@ class Procdecl(Statement):
 
 
 class GlobalVardecl(Statement):
-    def __init__(self, variable: Variable, type_, value: Number, location=None):
-        self.variable = variable
-        self.value = value
+    def __init__(self, variables: list[tuple[Variable, Expr]], type_, location=None):
+        self.variables = variables
         self.location = location
         self.type_ = type_
 
     def __str__(self):
-        return f"{str(self.type_)} {str(self.variable)} = {str(self.value)}"
+        res = ""
+        for variable, expr in self.variables:
+            res += f"{str(self.type_)} {str(variable)} = {str(expr)}"
+        return res 
 
     def check_syntax(self, global_decls):
-        # check that the type is valid
-        if self.type_ not in valid_types:
-            error_message(f"invalid variable type: {self.type_}", self.location)
+        for variable, expr in self.variables:
+            # check that the type is valid
+            if self.type_ not in valid_types:
+                error_message(f"invalid variable type: {self.type_}", self.location)
 
-        # check that value is number
-        if isinstance(self.value, Number):
-            if not 0 <= self.value.value < 2**63:
-                error_message(f"integer value {self.value.value} does not fit within 63 bits", self.location)
-        else:
-            error_message(f"global variable value {str(self.value)} is not a number", self.location)
+            # check that value is number
+            if isinstance(expr, Number):
+                if not 0 <= expr.value < 2**63:
+                    error_message(f"integer value {expr.value} does not fit within 63 bits", self.location)
+            else:
+                error_message(f"global variable value {str(expr)} is not a number", self.location)
 
-        # declaration twice
-        if self.variable.name in global_decls.keys():
-            if global_decls[self.variable.name].location is not None:
-                print(f"Info: initial declaration on line {global_decls[self.variable.name].location[0]}")
-            error_message(f"variable already declared: {self.variable.name}", self.location)
+            # declaration twice
+            if variable.name in global_decls.keys():
+                if global_decls[variable.name].location is not None:
+                    print(f"Info: initial declaration on line {global_decls[variable.name].location[0]}")
+                error_message(f"variable already declared: {variable.name}", self.location)
 
-        global_decls[self.variable.name] = self
+            global_decls[variable.name] = self
 
 
 class GlobalScope():
