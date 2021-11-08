@@ -10,6 +10,7 @@ class Muncher():
         self.local_vars = [{}]
         self.break_stack = []
         self.continue_stack = []
+        self.proc_name = "main"
 
     def __getitem__(self, key):
         for dic in reversed(self.local_vars):
@@ -41,9 +42,10 @@ def fresh():
     TOTAL_VARIABLES += 1
     return x
 
-def fresh_label():
+def fresh_label(local_vars: Muncher):
+    proc_name = local_vars.proc_name
     global TOTAL_LABELS
-    L = f"%.L{TOTAL_LABELS}"
+    L = f"%.L{proc_name}{TOTAL_LABELS}"
     TOTAL_LABELS += 1
     return L
 
@@ -76,20 +78,20 @@ def bool_expr_to_code(x, Lt, Lf, local_vars):
 
         if x.arg2.type_ == "bool":
             if x.op.name == "BOOLAND":
-                Li = fresh_label()
+                Li = fresh_label(local_vars)
                 e1 = bool_expr_to_code(x.arg1, Li, Lf, local_vars)
                 e2 = bool_expr_to_code(x.arg2, Lt, Lf, local_vars)
                 return e1 + [{"opcode":"label", "args":[Li], "result":None}] + e2
 
             if x.op.name == "BOOLOR":
-                Li = fresh_label()
+                Li = fresh_label(local_vars)
                 e1 = bool_expr_to_code(x.arg1, Lt, Li, local_vars)
                 e2 = bool_expr_to_code(x.arg2, Lt, Lf, local_vars)
                 return e1 + [{"opcode":"label", "args":[Li], "result":None}] + e2
 
             if x.op.name == "EQUALS":
-                Lz = fresh_label()
-                Lo = fresh_label()
+                Lz = fresh_label(local_vars)
+                Lo = fresh_label(local_vars)
                 e1 = bool_expr_to_code(x.arg1, Lz, Lo, local_vars)
                 ez = bool_expr_to_code(x.arg2, Lt, Lf, local_vars)
                 eo = bool_expr_to_code(x.arg2, Lf, Lt, local_vars)
@@ -100,8 +102,8 @@ def bool_expr_to_code(x, Lt, Lf, local_vars):
                        eo
 
             if x.op.name == "NEQUALS":
-                Lz = fresh_label()
-                Lo = fresh_label()
+                Lz = fresh_label(local_vars)
+                Lo = fresh_label(local_vars)
                 e1 = bool_expr_to_code(x.arg1, Lz, Lo, local_vars)
                 ez = bool_expr_to_code(x.arg2, Lf, Lt, local_vars)
                 eo = bool_expr_to_code(x.arg2, Lt, Lf, local_vars)
@@ -174,8 +176,8 @@ def expression_to_code(e, x, local_vars):
             else:
                 y = fresh()
                 if arg.type_ == "bool":
-                    Lt = fresh_label()
-                    Lf = fresh_label()
+                    Lt = fresh_label(local_vars)
+                    Lf = fresh_label(local_vars)
                     e2 = bool_expr_to_code(arg, Lt, Lf, local_vars)
                     e1 = [{"opcode":"const", "args":[0], "result":y}] +\
                           e2 +\
@@ -214,8 +216,8 @@ def statement_to_code(s, local_vars: Muncher):
         x = local_vars[s.variable.name]
         if s.expression.type_ == "bool":
             t = fresh()
-            Lt = fresh_label()
-            Lf = fresh_label()
+            Lt = fresh_label(local_vars)
+            Lf = fresh_label(local_vars)
             e1 = bool_expr_to_code(s.expression, Lt, Lf, local_vars)
             return [{"opcode":"const", "args":[0], "result":t}] +\
                    e1 +\
@@ -257,9 +259,9 @@ def statement_to_code(s, local_vars: Muncher):
         return res
 
     if isinstance(s, Ifelse):
-        Lt = fresh_label()
-        Lf = fresh_label()
-        Lo = fresh_label()
+        Lt = fresh_label(local_vars)
+        Lf = fresh_label(local_vars)
+        Lo = fresh_label(local_vars)
         e1 = bool_expr_to_code(s.condition, Lt, Lf, local_vars)
         s1 = statement_to_code(s.block, local_vars)
         s2 = statement_to_code(s.optelse, local_vars)
@@ -272,9 +274,9 @@ def statement_to_code(s, local_vars: Muncher):
                [{"opcode":"label", "args":[Lo], "result":None}]
 
     if isinstance(s, While):
-        Lhead = fresh_label()
-        Lbod = fresh_label()
-        Lend = fresh_label()
+        Lhead = fresh_label(local_vars)
+        Lbod = fresh_label(local_vars)
+        Lend = fresh_label(local_vars)
         local_vars.break_stack.append(Lend)
         local_vars.continue_stack.append(Lhead)
         e1 = bool_expr_to_code(s.condition, Lbod, Lend, local_vars)
@@ -353,5 +355,6 @@ def program2tac(ast: GlobalScope):
     for global_var in ast.global_vars:
         tac += global_to_code(global_var, localvars)
     for procdecl in ast.procedures:
+        localvars.proc_name = procdecl.name
         tac.append(procdecl_to_code(procdecl, localvars))
     return tac

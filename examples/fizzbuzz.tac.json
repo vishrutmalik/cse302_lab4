@@ -9,7 +9,7 @@
    {
     "opcode": "label",
     "args": [
-     "%.L1"
+     "%.Lfizzbuzz1"
     ],
     "result": null
    },
@@ -54,14 +54,14 @@
     "opcode": "jz",
     "args": [
      "%2",
-     "%.L3"
+     "%.Lfizzbuzz3"
     ],
     "result": null
    },
    {
     "opcode": "label",
     "args": [
-     "%.L4"
+     "%.Lfizzbuzz4"
     ],
     "result": null
    },
@@ -106,14 +106,14 @@
     "opcode": "jz",
     "args": [
      "%14",
-     "%.L9"
+     "%.Lfizzbuzz9"
     ],
     "result": null
    },
    {
     "opcode": "label",
     "args": [
-     "%.L10"
+     "%.Lfizzbuzz10"
     ],
     "result": null
    },
@@ -136,14 +136,14 @@
    {
     "opcode": "label",
     "args": [
-     "%.L11"
+     "%.Lfizzbuzz11"
     ],
     "result": null
    },
    {
     "opcode": "label",
     "args": [
-     "%.L5"
+     "%.Lfizzbuzz5"
     ],
     "result": null
    },
@@ -195,21 +195,21 @@
     "opcode": "jle",
     "args": [
      "%0",
-     "%.L1"
+     "%.Lfizzbuzz1"
     ],
     "result": null
    },
    {
     "opcode": "jmp",
     "args": [
-     "%.L2"
+     "%.Lfizzbuzz2"
     ],
     "result": null
    },
    {
     "opcode": "label",
     "args": [
-     "%.L9"
+     "%.Lfizzbuzz9"
     ],
     "result": null
    },
@@ -239,14 +239,14 @@
    {
     "opcode": "jmp",
     "args": [
-     "%.L11"
+     "%.Lfizzbuzz11"
     ],
     "result": null
    },
    {
     "opcode": "label",
     "args": [
-     "%.L3"
+     "%.Lfizzbuzz3"
     ],
     "result": null
    },
@@ -291,14 +291,14 @@
     "opcode": "jz",
     "args": [
      "%6",
-     "%.L6"
+     "%.Lfizzbuzz6"
     ],
     "result": null
    },
    {
     "opcode": "label",
     "args": [
-     "%.L7"
+     "%.Lfizzbuzz7"
     ],
     "result": null
    },
@@ -328,21 +328,21 @@
    {
     "opcode": "label",
     "args": [
-     "%.L8"
+     "%.Lfizzbuzz8"
     ],
     "result": null
    },
    {
     "opcode": "jmp",
     "args": [
-     "%.L5"
+     "%.Lfizzbuzz5"
     ],
     "result": null
    },
    {
     "opcode": "label",
     "args": [
-     "%.L6"
+     "%.Lfizzbuzz6"
     ],
     "result": null
    },
@@ -372,14 +372,14 @@
    {
     "opcode": "jmp",
     "args": [
-     "%.L8"
+     "%.Lfizzbuzz8"
     ],
     "result": null
    },
    {
     "opcode": "label",
     "args": [
-     "%.L2"
+     "%.Lfizzbuzz2"
     ],
     "result": null
    }
