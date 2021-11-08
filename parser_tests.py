@@ -27,7 +27,6 @@ class testParser(unittest.TestCase):
             ast.check_syntax()
             lexer.lineno = 1
 
-
     def test_parse_scopevars(self):
         fname = "scopevars.bx"
         with open(f"{dirname}/examples/{fname}", 'r') as f:
@@ -35,8 +34,14 @@ class testParser(unittest.TestCase):
             ast.check_syntax()
             lexer.lineno = 1
 
-    def test_parse_arithops(self):
+    def test_parse_fizzbuzz(self):
         fname = "fizzbuzz.bx"
+        with open(f"{dirname}/examples/{fname}", 'r') as f:
+            ast = parser.parse(f.read(), lexer=lexer)
+            lexer.lineno = 1
+
+    def test_parse_bool_print(self):
+        fname = "bool_print.bx"
         with open(f"{dirname}/examples/{fname}", 'r') as f:
             ast = parser.parse(f.read(), lexer=lexer)
             lexer.lineno = 1

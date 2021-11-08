@@ -12,11 +12,6 @@ from io import StringIO
 class Instr:
   __slots__ = ('iid', 'result', 'opcode', 'args', 'arg1', 'arg2')
   def __init__(self, result, opcode, args):
-    """Create a new TAC instruction with given `opcode' (must be non-None).
-    The other three arguments, `result', 'arg1', and 'arg2' depend on what
-    the opcode is.
-
-    Raises ValueError if attempting to create an invalid Instr."""
     self.result = result
     self.opcode = opcode
     self.args = tuple(args)
@@ -440,7 +435,9 @@ def execute(gvars, procs, proc_name, args, **kwargs):
           raise RuntimeError(f'Bad number of arguments to {instr.arg1}(): '
                      f'expected {instr.arg2}, got {len(params)}')
         kwargs['depth'] = depth + 1
-        values[instr.result] = execute(gvars, procs, instr.arg1, params, **kwargs)
+        result = execute(gvars, procs, instr.arg1, params, **kwargs)
+        if instr.result:
+          values[instr.result] = result
       params = []
       pc += 1
     elif instr.opcode == 'ret':

@@ -289,7 +289,7 @@ def p_expr_boolor(p):
 
 def p_expr_procedure(p):
     """expr : IDENT LPAREN exprsq RPAREN"""
-    p[0] = bxast.ProcCall(p[1],p[3])
+    p[0] = bxast.ProcCall(p[1], p[3], [p.lineno(1)])
 
 def p_exprsq(p):
     """exprsq : expr exprstar 
