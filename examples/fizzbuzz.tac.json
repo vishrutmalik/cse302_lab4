@@ -2,8 +2,8 @@
  {
   "proc": "@fizzbuzz",
   "args": [
-   "%last",
-   "%cur"
+   "%cur",
+   "%last"
   ],
   "body": [
    {

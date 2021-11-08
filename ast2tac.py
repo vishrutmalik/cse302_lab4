@@ -70,7 +70,7 @@ def bool_expr_to_code(x, Lt, Lf, local_vars):
             t2 = fresh()
             e1 = expression_to_code(x.arg1, t1, local_vars)
             e2 = expression_to_code(x.arg2, t2, local_vars)
-            return e1 + e2 + [{"opcode":"sub", "args":[t2, t1], "result":t1},
+            return e1 + e2 + [{"opcode":"sub", "args":[t1, t2], "result":t1},
                                 {"opcode":jump, "args":[t1, Lt], "result":None},
                                 {"opcode":"jmp", "args":[Lf], "result":None}]
 

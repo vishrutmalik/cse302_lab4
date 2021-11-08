@@ -1,0 +1,183 @@
+[
+ {
+  "proc": "@fizzbuzz",
+  "args": [
+   "%f",
+   "%s",
+   "%t",
+   "%fr",
+   "%fi"
+  ],
+  "body": [
+   {
+    "opcode": "param",
+    "args": [
+     1,
+     "%f"
+    ],
+    "result": null
+   },
+   {
+    "opcode": "call",
+    "args": [
+     "@__bx_print_int",
+     1
+    ],
+    "result": null
+   },
+   {
+    "opcode": "param",
+    "args": [
+     1,
+     "%s"
+    ],
+    "result": null
+   },
+   {
+    "opcode": "call",
+    "args": [
+     "@__bx_print_int",
+     1
+    ],
+    "result": null
+   },
+   {
+    "opcode": "param",
+    "args": [
+     1,
+     "%t"
+    ],
+    "result": null
+   },
+   {
+    "opcode": "call",
+    "args": [
+     "@__bx_print_int",
+     1
+    ],
+    "result": null
+   },
+   {
+    "opcode": "param",
+    "args": [
+     1,
+     "%fr"
+    ],
+    "result": null
+   },
+   {
+    "opcode": "call",
+    "args": [
+     "@__bx_print_int",
+     1
+    ],
+    "result": null
+   },
+   {
+    "opcode": "param",
+    "args": [
+     1,
+     "%fi"
+    ],
+    "result": null
+   },
+   {
+    "opcode": "call",
+    "args": [
+     "@__bx_print_int",
+     1
+    ],
+    "result": null
+   }
+  ]
+ },
+ {
+  "proc": "@main",
+  "args": [],
+  "body": [
+   {
+    "opcode": "const",
+    "args": [
+     1
+    ],
+    "result": "%0"
+   },
+   {
+    "opcode": "param",
+    "args": [
+     1,
+     "%0"
+    ],
+    "result": null
+   },
+   {
+    "opcode": "const",
+    "args": [
+     2
+    ],
+    "result": "%1"
+   },
+   {
+    "opcode": "param",
+    "args": [
+     2,
+     "%1"
+    ],
+    "result": null
+   },
+   {
+    "opcode": "const",
+    "args": [
+     3
+    ],
+    "result": "%2"
+   },
+   {
+    "opcode": "param",
+    "args": [
+     3,
+     "%2"
+    ],
+    "result": null
+   },
+   {
+    "opcode": "const",
+    "args": [
+     4
+    ],
+    "result": "%3"
+   },
+   {
+    "opcode": "param",
+    "args": [
+     4,
+     "%3"
+    ],
+    "result": null
+   },
+   {
+    "opcode": "const",
+    "args": [
+     5
+    ],
+    "result": "%4"
+   },
+   {
+    "opcode": "param",
+    "args": [
+     5,
+     "%4"
+    ],
+    "result": null
+   },
+   {
+    "opcode": "call",
+    "args": [
+     "@fizzbuzz",
+     5
+    ],
+    "result": null
+   }
+  ]
+ }
+]
