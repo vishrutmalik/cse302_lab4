@@ -28,7 +28,7 @@ reserved = {
 }
 
 tokens = (
-    'LPAREN', 'RPAREN', 'SEMICOLON', 'EQ', 'LBRACE', 'RBRACE', 'COLON', 'COMMA'
+    'LPAREN', 'RPAREN', 'SEMICOLON', 'EQ', 'LBRACE', 'RBRACE', 'COLON', 'COMMA',
     'PLUS', 'MINUS', 'TIMES', 'DIV', 'MODULUS',
     'BITAND', 'BITOR', 'BITXOR', 'LT', 'GT', 'BITCOMPL','IDENT', 'NUMBER', 'BOOLNOT', 'BOOLOR', 'BOOLAND', 'BOOLEQ', 'NEQUALS', 'SHL', 'SHR', 'GTE', 'LTE'
 ) + tuple(reserved.values())
