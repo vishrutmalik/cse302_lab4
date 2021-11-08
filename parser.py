@@ -13,7 +13,7 @@ def p_program(p):
 ## decl
 def p_declstar(p):
     """declstar : declstar decl
-                   | """
+                | """
     if len(p) == 1:
             p[0] = []
     else:
@@ -56,16 +56,12 @@ def p_procdecl(p):
     p[0] = bxast.Procdecl(p[1], p[4], p[6])
 
 def p_paramsq(p):
-    """paramsq : params 
+    """paramsq : param paramstar 
                |"""
     if len(p) == 1:
         p[0] = []
     else:
-        p[0] = p[1]
-
-def p_params(p):
-    """params : param paramstar"""
-    p[0] = p[2].append(p[1])
+        p[0] = [p[1]] + p[2]
 
 def p_paramstar(p):
     """paramstar : paramstar COMMA param
