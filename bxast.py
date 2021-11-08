@@ -211,7 +211,7 @@ class ProcCall(Expr):
         for arg in self.args:
             arg.check_syntax(current_state)
         
-        if self.proc_name == "print":
+        if self.proc_name == "print" or self.proc_name == "__bx_print_int" or self.proc_name == "__bx_print_bool":
             if len(self.args) != 1:
                 error_message(f"Incorrect number of args ({len(self.args)}) given for print: 1 expected", self.location)
             
