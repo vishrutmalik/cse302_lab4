@@ -228,12 +228,10 @@ class ProcCall(Expr):
 
         typelist = [arg.type_ for arg in self.args]
 
-        print(current_state.declared_procs.keys())
-        print(self.proc_name)
         if self.proc_name not in current_state.declared_procs.keys():
             error_message(f"undeclared procedure: {self.proc_name}", self.location)
 
-        proc_type, arg_types = current_state.declared_procs[self.proc_name]
+        arg_types, proc_type = current_state.declared_procs[self.proc_name]
         if typelist != arg_types:
             error_message(f"Incorrect call to procedure {self.proc_name}: incorrect argument type(s)", self.location)
         
@@ -307,8 +305,8 @@ class Ifelse(Statement):
 
     def __str__(self):
         if self.optelse == None:
-            return f"if ({self.condition})" + str(self.block)
-        return f"if ({self.condition})" + str(self.block) \
+            return f"if {self.condition}" + str(self.block)
+        return f"if {self.condition}" + str(self.block) \
             + "\n else " + str(self.optelse)
     
     def check_syntax(self, current_state: CheckState):
@@ -331,7 +329,7 @@ class While(Statement):
         self.return_ = False
 
     def __str__(self):
-        return f"while ({self.condition})" + "{\n" + str(self.block) + "}"
+        return f"while {self.condition}" + " {\n" + str(self.block) + "}"
     
     def check_syntax(self, current_state: CheckState):
         self.condition.check_syntax(current_state)
@@ -431,8 +429,11 @@ class Procdecl(Statement):
         self.location = location
 
     def __str__(self):
-        res = "\n".join(str(statement)
+        params = ", ".join([str(param) for param in self.params])
+        res = f"def {self.name}({params})" + " {\n"
+        res += "\n".join(str(statement)
                         for statement in self.statements)
+        res += "\n}" 
         return res
     
     def get_type(self, proc_decls):
