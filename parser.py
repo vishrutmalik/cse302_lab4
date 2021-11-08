@@ -62,7 +62,7 @@ def p_paramsq(p):
     if len(p) == 1:
         p[0] = []
     else:
-        p[0] = [p[1]] + p[2]
+        p[0] = p[1] + p[2]
 
 def p_paramstar(p):
     """paramstar : paramstar COMMA param
@@ -71,12 +71,12 @@ def p_paramstar(p):
             p[0] = []
     else:
             p[0] = p[1]
-            p[0].append(p[3])
+            p[0] += p[3]
 
 def p_param(p):
     """param : IDENT morestar COLON type"""
-    morestar = [bxast.Param(name, p[4], location) for name, location in p[2]]
-    p[0] = morestar.append(bxast.Param(p[1], p[4], [p.lineno(1)])) 
+    p[0] = [bxast.Param(name, p[4], location) for name, location in p[2]]
+    p[0].append(bxast.Param(p[1], p[4], [p.lineno(1)])) 
 
 def p_morestar(p):
     """morestar : morestar COMMA IDENT

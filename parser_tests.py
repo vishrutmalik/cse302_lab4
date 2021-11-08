@@ -35,6 +35,12 @@ class testParser(unittest.TestCase):
             ast.check_syntax()
             lexer.lineno = 1
 
+    def test_parse_arithops(self):
+        fname = "fizzbuzz.bx"
+        with open(f"{dirname}/examples/{fname}", 'r') as f:
+            ast = parser.parse(f.read(), lexer=lexer)
+            lexer.lineno = 1
+
 class testPrecedence(unittest.TestCase):
     def setUp(self):
         with open(f"{dirname}/examples/smallcond2.bx", 'r') as f:
