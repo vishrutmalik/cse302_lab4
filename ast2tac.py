@@ -173,12 +173,24 @@ def expression_to_code(e, x, local_vars):
                 res.append({"opcode":"param", "args": [i+1, y], "result":None})
             else:
                 y = fresh()
-                e = expression_to_code(arg, y, local_vars)
-                res += e
+                if arg.type_ == "bool":
+                    Lt = fresh_label()
+                    Lf = fresh_label()
+                    e2 = bool_expr_to_code(arg, Lt, Lf, local_vars)
+                    e1 = [{"opcode":"const", "args":[0], "result":y}] +\
+                          e2 +\
+                         [{"opcode":"label", "args":[Lt], "result":None},
+                          {"opcode":"const", "args":[1], "result":y},
+                          {"opcode":"label", "args":[Lf], "result":None},
+                          {"opcode":"copy", "args":[y], "result":x}]
+                else:
+                    e1 = expression_to_code(arg, y, local_vars)
+                res += e1
                 res.append({"opcode":"param", "args":[i+1, y], "result":None})
-        
+
         name = '@' + e.proc_name
         res.append({"opcode":"call", "args":[name, len(e.args)], "result":x})
+        return res
 
 
     print(f"Unrecognized expression type: {type(e)}, line {e.location[0]}")
