@@ -31,7 +31,7 @@ unop_dict = {
 
 valid_types = ["int", "bool", "void"]
 
-def error_message(error_msg, loc):
+def error_message(error_msg, loc=None):
     if loc is not None:
         print(f"Error: {error_msg} on line {loc[0]}")
     else:
@@ -131,7 +131,7 @@ class Number(Expr):
         return str(self.value)
 
     def check_syntax(self, current_state):
-        if not 0 <= self.value < 2**63:
+        if not -2**63 < self.value < 2**63:
             error_message(f"integer value {self.value} does not fit within 63 bits", self.location)
         self.type_ = "int"
 
@@ -223,10 +223,15 @@ class ProcCall(Expr):
             else:
                 error_message(f"Unprintable type: {arg.type_}", self.location)
 
+            self.type_ = "void" 
+            return
+
         typelist = [arg.type_ for arg in self.args]
 
+        print(current_state.declared_procs.keys())
+        print(self.proc_name)
         if self.proc_name not in current_state.declared_procs.keys():
-            error_message(f"undeclared procedure {self.proc_name} called", self.location)
+            error_message(f"undeclared procedure: {self.proc_name}", self.location)
 
         proc_type, arg_types = current_state.declared_procs[self.proc_name]
         if typelist != arg_types:
@@ -417,12 +422,12 @@ class Return(Statement):
                 
 
 class Procdecl(Statement):
-    def __init__(self, name: str, params: list[Param], statements, rtt, location=None):
+    def __init__(self, name: str, params: list[Param], statements: Block, rtt, location=None):
         self.name = name
         self.params = params
         self.argtype = [param.type_ for param in params] 
         self.return_type = rtt
-        self.statements = statements
+        self.statements = [statement for statement in statements.statements]
         self.location = location
 
     def __str__(self):
@@ -454,8 +459,9 @@ class Procdecl(Statement):
             if statement.return_:
                 saw_return = True
         
-        if not saw_return:
-            error_message(f"{self.name}: return not found on all code paths", self.location)
+        if self.return_type != "void":
+            if not saw_return:
+                error_message(f"{self.name}: return not found on all code paths", self.location)
 
         current_state.declared_vars.pop()
 
@@ -518,8 +524,8 @@ class GlobalScope():
             global_var.check_syntax(global_declarations)
         procedure_declarations = {}
         for procdecl in self.procedures:
-             procedure_declarations[procdecl.name] = procdecl.get_type()
-        
+            procdecl.get_type(procedure_declarations)
+
         if "main" not in procedure_declarations.keys():
             error_message("no main procedure found")
 

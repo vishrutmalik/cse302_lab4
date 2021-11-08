@@ -36,7 +36,8 @@ def p_vardecl(p):
 def p_varinits(p):
     """varinits : IDENT EQ expr varstar"""
     var = bxast.Variable(p[1], [p.lineno(1)])
-    p[0] = p[4].append((var, p[3]))
+    p[0] = p[4]
+    p[0].append((var, p[3]))
 
 def p_varstar(p):
     """varstar : varstar newvar
@@ -53,7 +54,7 @@ def p_newvar(p):
 
 def p_procdecl(p):
     """procdecl : DEF IDENT LPAREN paramsq RPAREN tydeclq block"""
-    p[0] = bxast.Procdecl(p[1], p[4], p[6])
+    p[0] = bxast.Procdecl(p[2], p[4], p[7], p[6], [p.lineno(1)])
 
 def p_paramsq(p):
     """paramsq : param paramstar 
@@ -98,15 +99,10 @@ def p_tydeclq(p):
     else:
         p[0] = p[2]
 
-def p_tydecl(p):
-    """tydecl : COLON type"""
-    p[0] = p[2]
-
 # Statements
 def p_statement(p):
     """stmt : vardecl
             | assign
-            | print
             | ifelse
             | while
             | block
@@ -130,12 +126,6 @@ def p_statements(p):
 def p_assign(p):
     """assign : IDENT EQ expr SEMICOLON"""
     p[0] = bxast.Assign(bxast.Variable(p[1], [p.lineno(1)]), p[3], [p.lineno(2)])
-
-## Print
-
-def p_print(p):
-    """print : PRINT LPAREN expr RPAREN SEMICOLON"""
-    p[0] = bxast.Print(p[3], [p.lineno(1)])
 
 ## Return
 
