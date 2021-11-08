@@ -240,7 +240,7 @@ class Statement():
 
 
 class Vardecl(Statement):
-    def __init__(self, variables: list[(Variable, Expr)], type_, location=None):
+    def __init__(self, variables: list[tuple[Variable, Expr]], type_, location=None):
         self.variables = variables
         self.location = location
         self.type_ = type_
@@ -461,7 +461,7 @@ class Procdecl(Statement):
 
 
 class GlobalVardecl(Statement):
-    def __init__(self, variables: list[(Variable, Expr)], type_, location=None):
+    def __init__(self, variables: list[tuple[Variable, Expr]], type_, location=None):
         self.variables = variables
         self.location = location
         self.type_ = type_
