@@ -299,7 +299,8 @@ def statement_to_code(s, local_vars: Muncher):
         sys.exit(1)
     
     if isinstance(s, Eval):
-        return expression_to_code(s.expression, None, local_vars)
+        x = fresh()
+        return expression_to_code(s.expression, x, local_vars)
     
     if isinstance(s, Return):
         if s.expression is None:

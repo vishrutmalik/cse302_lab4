@@ -213,7 +213,7 @@
      "@__bx_print_bool",
      1
     ],
-    "result": "%0"
+    "result": null
    },
    {
     "opcode": "const",
@@ -495,7 +495,7 @@
      "@__bx_print_bool",
      1
     ],
-    "result": "%2"
+    "result": null
    },
    {
     "opcode": "const",
@@ -1001,7 +1001,7 @@
      "@__bx_print_bool",
      1
     ],
-    "result": "%4"
+    "result": null
    },
    {
     "opcode": "const",
@@ -2011,7 +2011,7 @@
      "@__bx_print_bool",
      1
     ],
-    "result": "%6"
+    "result": null
    },
    {
     "opcode": "const",
@@ -2265,7 +2265,7 @@
      "@__bx_print_bool",
      1
     ],
-    "result": "%8"
+    "result": null
    },
    {
     "opcode": "const",
@@ -2547,7 +2547,7 @@
      "@__bx_print_bool",
      1
     ],
-    "result": "%10"
+    "result": null
    },
    {
     "opcode": "const",
@@ -3053,7 +3053,7 @@
      "@__bx_print_bool",
      1
     ],
-    "result": "%12"
+    "result": null
    },
    {
     "opcode": "const",
@@ -4077,7 +4077,7 @@
      "@__bx_print_bool",
      1
     ],
-    "result": "%14"
+    "result": null
    },
    {
     "opcode": "const",
@@ -6319,7 +6319,7 @@
      "@__bx_print_bool",
      1
     ],
-    "result": "%16"
+    "result": null
    }
   ]
  }

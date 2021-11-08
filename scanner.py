@@ -84,7 +84,7 @@ def t_NUMBER(t):
     r'0|-?[1-9][0-9]*'
     # t.type == 'NUMBER'
     t.value = int(t.value)
-    if not (-(1<<63) <= t.value < (1<<63)):
+    if not (-(1<<63) < t.value < (1<<63)):
         print(t, f'Error: illegal numerical literal, {t.value} not in range(-1<<63, 1<<63) on line {t.lineno}')
         sys.exit(1)
     return t
