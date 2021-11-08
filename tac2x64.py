@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 """
-This is a very simple TAC to x64 assembly pass. It only handles straightline
-code and a single main() function.
 
 Usage: python3 tac2asm.py tacfile.json
 Produces: tacfile.s (assembly) and tacfile.exe (executable)
@@ -57,6 +55,8 @@ jump_map = { 'jmp': (lambda ld: f"jmp {ld}"),
             'jnle': (lambda ra, rd: [f'movq {ra}, %rax',
                                   f"jnle %rax, {rd}"]) }
 
+
+arg_reg={'%rdi':0, '%rsi':0, '%rdx':0, '%rcx':0, '%r8':0, '%r9':0}
 
 def lookup_temp(temp, temp_map):
   assert (isinstance(temp, str) and \
